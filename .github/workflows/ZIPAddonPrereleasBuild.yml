@@ -1,0 +1,47 @@
+# Create a prerelease build .zip of the (filtered) contents of the matching version branch
+# When a new tag is pushed with a semantic versioning format and suffixes other than _stable
+name: ZIP Addon Pre-release Build
+
+on:
+  push:
+    tags-ignore:
+      - '*_stable'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Set branch to the first two numbers of the tag with a decimal point
+      - name: Extract branch name
+        id: extract_branch_name
+        run: |
+          branch_name=$(echo "${{ github.ref_name }}" | sed -E 's/^[^0-9]*([0-9]+\.[0-9]+).*/\1/')
+          echo "::set-output name=branch_name::${branch_name}"
+
+      # Checkout the repository under a subdirectory (repository-name/) to
+      # make zipping easier. Note: 'gh' or 'git' commands must be executed
+      # *after* changing into the repository's directory.
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.extract_branch_name.outputs.branch_name }}
+          path: ${{ github.event.repository.name }}
+
+      # Create a filtered zip of the repository.
+      - name: Zip Repository (excludes .git*)
+        run: |
+          zip -r ${{ github.event.repository.name }}_${{github.ref_name}}.zip \
+            ${{ github.event.repository.name }} \
+            -x "${{ github.event.repository.name }}/.git*" \
+            -x "${{ github.event.repository.name }}/.github/*" \
+            -x "${{ github.event.repository.name }}/.vs/*" \
+            -x "${{ github.event.repository.name }}/.vscode/*" \
+            -x "${{ github.event.repository.name }}/working_files/*"
+      
+      # Create a new GitHub release using the tag name or commit id.
+      - name: Create versioned build with filtered zip file.
+        run: |
+          cd ${{ github.event.repository.name }}
+          gh release create ${{github.ref_name}} --prerelease --generate-notes \
+            ../${{ github.event.repository.name }}_${{github.ref_name}}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
