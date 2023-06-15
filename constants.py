@@ -7,12 +7,12 @@ import os
 GBH_PACKAGE = __package__
 
 # URLs
-URL_DOCS = "https://thegixo.github.io/GBHToolDocs/"
+URL_DOCS = "https://notgixo.github.io/GBHToolDocs/"
 URL_YOUTUBE = "https://www.youtube.com/playlist?list=PLFexHVb3hTS5wZYhBsFuzS574-5uv1RZ5"
 URL_TWITTER = "https://twitter.com/notGixo"
 URL_DISCORD = "https://discord.com/invite/TxTpJ8FQaz"
 URL_GUMROAD = "https://gixo.gumroad.com/l/GBHTool"
-URL_UPDATE = "https://raw.githubusercontent.com/thegixo/GBHToolDocs/main/version.json"
+URL_UPDATE = "https://raw.githubusercontent.com/notgixo/GBHToolDocs/main/version.json"
 
 
 # Directories
