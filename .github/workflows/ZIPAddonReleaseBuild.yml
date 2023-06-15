@@ -1,4 +1,4 @@
-# Create a rerelease build .zip of the (filtered) contents of the main branch
+# Create a release build .zip of the (filtered) contents of the main branch
 # When a new tag is pushed with a semantic versioning format and _stable suffix
 name: ZIP Addon Release Build
 

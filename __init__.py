@@ -14,7 +14,7 @@ bl_info = {
     "warning": "",
     "support": "COMMUNITY",
     "category": "Object",
-    "doc_url": "https://thegixo.github.io/GBHToolDocs/",
+    "doc_url": "https://notgixo.github.io/GBHToolDocs/",
 }
 
 from . operators.update_ops import addon_info
