@@ -62,14 +62,18 @@ def ui_hair_presets(context, layout):
 
             col = box.column()
             col.scale_y = 1.5
-            if gbh_presets.presets_hair_type == "OBJECT":
-                text = "Import Hair Object to File"
 
-            else:
-                # col.alert = True
-                text = "Apply Selected Preset to the Hair Object"
+            presets_list = wm.get("gbh_presets_list")
 
-            col.operator("gbh.load_preset", text=text)
+            if presets_list:
+                if gbh_presets.presets_hair_type == "OBJECT":
+                    text = "Import Hair Object to File"
+
+                else:
+                    # col.alert = True
+                    text = "Apply Selected Preset to the Hair Object"
+
+                col.operator("gbh.load_preset", text=text)
 
     else:
         col.separator()

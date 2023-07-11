@@ -248,10 +248,8 @@ def copy_modifiers(context, source_object, target_object, clear_existing_modifie
         )
 
         # Copy modifiers from source to target objects
-
-        override = bpy.context.copy()
-        override["object"] = source_object
-        bpy.ops.object.make_links_data(override, type="MODIFIERS")
+        with context.temp_override(selected_objects=source_object):
+            bpy.ops.object.make_links_data(type="MODIFIERS")
 
 
 def set_object_location(obj, location):

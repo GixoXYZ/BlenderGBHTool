@@ -204,6 +204,7 @@ class GBH_LibraryProperties(PropertyGroup):
     lib_search: StringProperty(
         name="Library Search",
         description="Search for keywords in library",
+        options={"TEXTEDIT_UPDATE"},
         default="",
         update=_lib_search_update
     )

@@ -91,7 +91,6 @@ def lib_categories_and_search(layout):
     row = box.row(align=True)
     # row.label(text="Search")
     row.prop(gbh_lib, "lib_search", text="Search")
-    row.operator("gbh.lib_clear_search", text="", icon="PANEL_CLOSE")
 
 
 def lib_pages(layout):
