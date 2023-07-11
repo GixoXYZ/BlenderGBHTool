@@ -187,22 +187,16 @@ class GBH_OT_load_preset(Operator):
         presets_list = wm.get("gbh_presets_list")
 
         # If presets list is not empty
-        if presets_list:
-            file_name = _get_preset_file_name()
-            file_loc = _get_preset_file_loc(context, file_name)
-            object_path = file_loc
-            obj = cf.append_object(self, object_path, file_name)
+        file_name = _get_preset_file_name()
+        file_loc = _get_preset_file_loc(context, file_name)
+        object_path = file_loc
+        obj = cf.append_object(self, object_path, file_name)
 
-            if gbh_presets.presets_hair_type != "OBJECT":
-                cf.copy_modifiers(context, obj, scene.hair_object, True)
-                cf.delete_item(obj.data)
+        if gbh_presets.presets_hair_type != "OBJECT":
+            cf.copy_modifiers(context, obj, scene.hair_object, True)
+            cf.delete_item(obj.data)
 
-            cf.set_active_object(context, scene.hair_object)
-
-        # If presets list is empty
-        elif not presets_list or len(presets_list) <= 0:
-            err = "Presets list is empty."
-            self.report({"ERROR"}, err)
+        cf.set_active_object(context, scene.hair_object)
 
         return {"FINISHED"}
 

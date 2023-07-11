@@ -416,32 +416,6 @@ class GBH_OT_open_user_file(Operator):
         return {"FINISHED"}
 
 
-class GBH_OT_lib_clear_search(Operator):
-    bl_idname = "gbh.lib_clear_search"
-    bl_label = "Clear Search Results"
-    bl_description = "Clear library search results"
-
-    def execute(self, context):
-        wm = bpy.context.window_manager
-        gbh_lib = wm.gbh_lib
-
-        gbh_lib.property_unset("lib_search")
-        gbh_lib.lib_page_index = 0
-
-        # Clear filtered lists
-        _filtered_node_groups_collection.clear()
-        _filtered_materials_collection.clear()
-
-        # Set filtered lists to raw lists
-        _filtered_node_groups_collection.extend(_node_groups_collection)
-        _filtered_materials_collection.extend(_materials_collection)
-
-        # Sort filtered lists
-        _filtered_node_groups_collection.sort()
-        _filtered_materials_collection.sort()
-        return {"FINISHED"}
-
-
 class GBH_OT_change_lib_page(Operator):
     bl_idname = "gbh.change_lib_page"
     bl_label = "Change Library Page"
@@ -471,7 +445,6 @@ classes = (
     GBH_OT_open_user_lib,
     GBH_OT_close_user_lib,
     GBH_OT_open_user_file,
-    GBH_OT_lib_clear_search,
     GBH_OT_change_lib_page,
 )
 
