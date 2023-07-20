@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# A minor portion of this program includes code from Antti Tikka's Modifier List Blender add-on released in April 1, 2022.
+
+# A portion of this program includes code from Antti Tikka's Modifier List Blender add-on released in April 1, 2022.
 # Modifier List's code is used under the terms of the GNU General Public License v3.
 
 
-# fmt: off
 bl_info = {
     "name": "GBH Tool",
     "author": "Gixo <notgixo@proton.me>",
     "description": "Gixo's Blender Hair Tool generates different hair styles using Blender's new hair system.",
     "blender": (3, 5, 0),
-    "version": (2, 1, 2, 1, "stable"),
+    "version": (2, 1, 3, "alpha", 1),
     "location": "View3D > Toolshelf > GBH Tool",
     "warning": "",
     "support": "COMMUNITY",
@@ -18,7 +18,6 @@ bl_info = {
 }
 
 from . operators.update_ops import addon_info
-# fmt: on
 
 if "bpy" in locals():
     import importlib
@@ -110,6 +109,7 @@ def register():
         item for item in bl_info["version"] if not isinstance(item, str)
     )
     gbh_version = ".".join([str(x) for x in version])
+    print(gbh_version)
     addon_info(gbh_version)
     for module in modules:
         module.register()
