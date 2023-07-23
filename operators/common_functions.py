@@ -33,7 +33,7 @@ def select_objects(context, objects, active_object):
 
     if objects and active_object:
         bpy.ops.object.select_all(action="DESELECT")
-        if type(objects) is list:
+        if isinstance(objects, list):
             for obj in objects:
                 obj.select_set(state=True, view_layer=context.view_layer)
 
@@ -159,7 +159,7 @@ def append_node_groups(self, context, path, ng_name):
         node_path = os.path.join(path, "NodeTree/")
         bpy.ops.wm.append(filename=ng_name, directory=node_path)
 
-    except (RuntimeError,  OSError) as err:
+    except (RuntimeError, OSError) as err:
         print(err)
         err = IMPORT_FAIL
         self.report({"ERROR"}, err)
@@ -174,7 +174,7 @@ def append_materials(self, context, path, mat_name):
         mat_path = os.path.join(path, "Material/")
         bpy.ops.wm.append(filename=mat_name, directory=mat_path)
 
-    except (RuntimeError,  OSError) as err:
+    except (RuntimeError, OSError) as err:
         print(err)
         err = IMPORT_FAIL
         self.report({"ERROR"}, err)

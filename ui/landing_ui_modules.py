@@ -56,7 +56,7 @@ def ui_hair_presets(context, layout):
             rem_button.operator("gbh.remove_preset", text="", icon="REMOVE")
 
             row = box.row(align=True)
-            row.enabled = scene.hair_object != None
+            row.enabled = scene.hair_object is not None
             row.prop(gbh_presets, "new_preset_name", text="Name")
             row.operator("gbh.save_preset", text="", icon="ADD")
 

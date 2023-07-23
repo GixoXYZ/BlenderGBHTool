@@ -41,7 +41,7 @@ class VIEW3D_PT_ng_ui_main(Panel, GBHBasePanel):
         if mod_list := list(obj.modifiers):
             with contextlib.suppress(IndexError, AttributeError):
                 mod = mod_list[obj.selected_mod_index]
-                modules.ng_stack(context, layout,  mod)
+                modules.ng_stack(context, layout, mod)
 
 
 classes = (

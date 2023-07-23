@@ -105,9 +105,9 @@ def lib_pages(layout):
         items = lib_ops.get_node_groups()
     total_items = len(items)
     if total_items % pref.lib_item_per_page == 0:
-        total_page = math.floor(total_items/pref.lib_item_per_page)
+        total_page = math.floor(total_items / pref.lib_item_per_page)
     else:
-        total_page = math.floor(total_items/pref.lib_item_per_page)+1
+        total_page = math.floor(total_items / pref.lib_item_per_page) + 1
 
     box = layout.box()
     row = box.row(align=True)
@@ -120,15 +120,15 @@ def lib_pages(layout):
             "gbh.change_lib_page",
             text="",
             icon="TRIA_LEFT"
-        ).page_index = gbh_lib.lib_page_index-1
+        ).page_index = gbh_lib.lib_page_index - 1
 
         right_sub_row = row.row(align=True)
-        right_sub_row.enabled = gbh_lib.lib_page_index < total_page-1
+        right_sub_row.enabled = gbh_lib.lib_page_index < total_page - 1
         right_sub_row.operator(
             "gbh.change_lib_page",
             text="",
             icon="TRIA_RIGHT"
-        ).page_index = gbh_lib.lib_page_index+1
+        ).page_index = gbh_lib.lib_page_index + 1
 
         pages_sub_row = box.grid_flow(
             even_columns=True, even_rows=True, row_major=True, align=True)
@@ -156,21 +156,21 @@ def lib_materials_grid(context, layout):
 
     total_items = len(mcoll)
     if total_items % pref.lib_item_per_page == 0:
-        total_page = math.floor(total_items/pref.lib_item_per_page)
+        total_page = math.floor(total_items / pref.lib_item_per_page)
         last_page_item = pref.lib_item_per_page
     else:
-        total_page = math.floor(total_items/pref.lib_item_per_page)+1
+        total_page = math.floor(total_items / pref.lib_item_per_page) + 1
         if gbh_lib.lib_page_index + 1 == total_page:
             last_page_item = total_items % pref.lib_item_per_page
         else:
             last_page_item = pref.lib_item_per_page
 
     if total_items != 0:
-        current_page_index = gbh_lib.lib_page_index*pref.lib_item_per_page
+        current_page_index = gbh_lib.lib_page_index * pref.lib_item_per_page
 
         # Make a box for each node group found in library file
         for i in range(last_page_item):
-            mat = mcoll[i+current_page_index]
+            mat = mcoll[i + current_page_index]
             mat_name = mat[0]
             box = layout.box()
             icon = pcoll[mat_name] if mat_name in pcoll else pcoll["Material"]
@@ -236,21 +236,21 @@ def lib_nodes_grid(context, layout):
 
     total_items = len(ncoll)
     if total_items % pref.lib_item_per_page == 0:
-        total_page = math.floor(total_items/pref.lib_item_per_page)
+        total_page = math.floor(total_items / pref.lib_item_per_page)
         last_page_item = pref.lib_item_per_page
     else:
-        total_page = math.floor(total_items/pref.lib_item_per_page)+1
+        total_page = math.floor(total_items / pref.lib_item_per_page) + 1
         if gbh_lib.lib_page_index + 1 == total_page:
             last_page_item = total_items % pref.lib_item_per_page
         else:
             last_page_item = pref.lib_item_per_page
 
     if total_items != 0:
-        current_page_index = gbh_lib.lib_page_index*pref.lib_item_per_page
+        current_page_index = gbh_lib.lib_page_index * pref.lib_item_per_page
 
         # Make a box for each node group found in library file
         for i in range(last_page_item):
-            ng = ncoll[i+current_page_index]
+            ng = ncoll[i + current_page_index]
             ng_name = ng[0]
             box = layout.box()
             icon = pcoll[ng_name] if ng_name in pcoll else pcoll["Node Group"]

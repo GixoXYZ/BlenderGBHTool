@@ -57,7 +57,7 @@ def ng_manage(context, layout):
     ).direction = "UP"
 
     down_button = sub_row.row(align=True)
-    down_button.enabled = obj.selected_mod_index < len(mod_list)-1
+    down_button.enabled = obj.selected_mod_index < len(mod_list) - 1
     down_button.operator(
         "gbh.modifier_move",
         text="",

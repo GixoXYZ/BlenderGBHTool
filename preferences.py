@@ -54,7 +54,7 @@ class GBHPreferences(AddonPreferences):
     update_available: BoolProperty(
         default=False,
     )
-    update_channel:  EnumProperty(
+    update_channel: EnumProperty(
         name="Update Channel",
         items=[
             ("gbh_tool_stable", "Stable", ""),

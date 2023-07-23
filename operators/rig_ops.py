@@ -176,7 +176,7 @@ class GBH_OT_hair_to_armature(Operator):
         try:
             _apply_skin_modifier(context, dummy_mesh, armature_name)
             if gbh_rig.rig_add_parent_bone:
-                parent_size = gbh_rig.rig_parent_size/100
+                parent_size = gbh_rig.rig_parent_size / 100
                 _add_parent_bone(scene, armature_name, parent_size)
 
             _clean_up(dummy_mesh, convert_ng, hair_duple)

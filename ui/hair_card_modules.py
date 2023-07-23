@@ -174,7 +174,7 @@ def hair_object(context, layout):
         name = new_object.row()
         name.label(text="New Curve Name")
         name.prop(gbh_hair_card, "hc_object_name", text="")
-        new_object.operator("gbh.add_hc_object",  icon="ADD")
+        new_object.operator("gbh.add_hc_object", icon="ADD")
 
         hair_objects_list = []
 

@@ -42,7 +42,7 @@ def _get_preset_file_name():
 
 def _get_preset_file_loc(context, file_name):
     path = _get_path(context)
-    return path+file_name+".blend"
+    return path + file_name + ".blend"
 
 
 def refresh_presets_list(self, context):
