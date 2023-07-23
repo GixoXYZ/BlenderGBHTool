@@ -23,10 +23,8 @@ class VIEW3D_PT_update_ui_main(Panel, GBHBasePanel):
 
     def draw(self, context):
         layout = self.layout
-        modules.update_version_info(context, layout)
-        modules.update_message(context, layout)
-        modules.update_changelog(context, layout)
-        modules.update_download(context, layout)
+        box = layout.box()
+        modules.update_download(context, box)
 
 
 classes = (

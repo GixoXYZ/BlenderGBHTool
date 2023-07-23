@@ -10,7 +10,6 @@ from bpy.props import (
     EnumProperty,
 )
 
-from . ui.common_ui import multi_line_text
 from . icons import load_icons
 from . import global_variables as gv
 from . operators.ui_ops import add_hotkey, remove_hotkey
@@ -39,28 +38,28 @@ class GBHPreferences(AddonPreferences):
     bl_idname = __package__
     scriptdir = bpy.path.abspath(os.path.dirname(__file__))
 
-    startup_update_check: BoolProperty(
-        name="Check for Updates on Blender Startup (with 24 hrs intervals)",
-        default=False,
+    automatic_update_check: BoolProperty(
+        name="Automatic Update Check",
+        default=True,
     )
-    update_latest_version: StringProperty(
-        default="85.85.85"
-    )
-    update_release_type: StringProperty()
-    update_blender_version: StringProperty()
-    update_message: StringProperty()
-    update_changelog: StringProperty(default="[]")
+    update_latest_version: StringProperty()
     last_update_check: StringProperty(default="Never")
     update_available: BoolProperty(
         default=False,
     )
-    update_channel: EnumProperty(
-        name="Update Channel",
+    preview_update: BoolProperty(
+        name="Include Preview Updates",
+        default=True,
+    )
+    update_check_interval: EnumProperty(
+        name="Update Check Interval",
         items=[
-            ("gbh_tool_stable", "Stable", ""),
-            ("gbh_tool_latest", "Latest", ""),
+            ("24", "Daily", ""),
+            ("168", "Weekly", ""),
+            ("336", "Biweekly", ""),
+            ("720", "Monthly", ""),
         ],
-        update=_update_channel,
+        default="168"
     )
     panel_update_switch: BoolProperty(
         name="Update Panel Toggle",
@@ -138,7 +137,7 @@ class GBHPreferences(AddonPreferences):
     )
     shortcut_key: EnumProperty(
         items=(
-            ('NONE', "Select key", ""),
+            ("NONE", "Select key", ""),
             ("LEFTMOUSE", "LEFTMOUSE", ""),
             ("MIDDLEMOUSE", "MIDDLEMOUSE", ""),
             ("RIGHTMOUSE", "RIGHTMOUSE", ""),
@@ -346,7 +345,12 @@ class GBHPreferences(AddonPreferences):
         col = box.column()
         col.label(text="Add-on Updates:")
         row = col.row()
-        if self.update_available:
+        row.scale_y = 1.3
+        if gv.update_checking:
+            row.enabled = False
+            row.operator("gbh.update_check", icon="FILE_REFRESH", text="Checking for Updates...")
+
+        elif self.update_available:
             row.operator(
                 "gbh.update_check",
                 text="",
@@ -355,47 +359,31 @@ class GBHPreferences(AddonPreferences):
             row.operator(
                 "wm.url_open",
                 icon="IMPORT",
-                text="Download"
-            ).url = gv.URL_DOCS
+                text=f"Download GBH Tool {self.update_latest_version}"
+            ).url = gv.update_url
+
+            sub_row = row.row()
+            sub_row.scale_x = 0.6
+            sub_row.operator(
+                "wm.url_open",
+                icon="INFO",
+                text="Changelog"
+            ).url = gv.update_info_url
 
         else:
             row.operator("gbh.update_check", icon="FILE_REFRESH")
 
-        row.prop(self, "update_channel", text="")
+        row.prop(self, "preview_update")
         row = col.row()
-        row.prop(self, "startup_update_check")
+        row.prop(self, "automatic_update_check")
+        row = row.row()
+        row.enabled = self.automatic_update_check
+        row.prop(self, "update_check_interval", text="")
+
         row = col.row()
         row.label(text=f"Lase Update Check: {self.last_update_check}")
         col = col.column()
         col.label(text=f"Last Update Check Report: {gbh_update.update_report}")
-        if self.update_available:
-            box = box.box()
-            box.label(text="Update Info")
-            col = box.column()
-
-            lv = self.update_latest_version
-            rt = self.update_release_type
-            bv = self.update_blender_version
-            um = self.update_message
-
-            row = box.row()
-            row.label(text="", icon="INFO")
-            col = row.column()
-            update_version = F"GBH Tool v{lv} {rt} is Available for Blender {bv} and later."
-            multi_line_text(
-                context=context,
-                text=update_version,
-                parent=col
-            )
-            if um != "":
-                row = box.row()
-                row.label(text="", icon="INFO")
-                col = row.column()
-                multi_line_text(
-                    context=context,
-                    text=um,
-                    parent=col
-                )
 
         box = layout.box()
         col = box.column()

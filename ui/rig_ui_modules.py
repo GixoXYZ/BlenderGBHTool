@@ -96,7 +96,7 @@ def rig_armature_creation(layout, context):
                     icon=icon
                 )
                 col.label(
-                    text="Using object's modifier could result in freezing of Blender.",
+                    text="Using object's modifiers could result in freezing of Blender.",
                     icon="INFO"
                 )
                 if gbh_rig.rig_use_mods:

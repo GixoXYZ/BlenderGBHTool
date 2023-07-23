@@ -17,7 +17,7 @@ bl_info = {
     "doc_url": "https://notgixo.github.io/GBHToolDocs/",
 }
 
-from . operators.update_ops import addon_info
+from . import global_variables as gv
 
 if "bpy" in locals():
     import importlib
@@ -105,12 +105,10 @@ modules = [
 
 
 def register():
-    version = tuple(
-        item for item in bl_info["version"] if not isinstance(item, str)
-    )
-    gbh_version = ".".join([str(x) for x in version])
-    print(gbh_version)
-    addon_info(gbh_version)
+
+    gv.GBH_VERSION = list(bl_info["version"])
+    print(gv.GBH_VERSION)
+
     for module in modules:
         module.register()
 
