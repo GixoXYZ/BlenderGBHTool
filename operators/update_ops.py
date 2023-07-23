@@ -7,7 +7,7 @@ import datetime
 import concurrent.futures
 from bpy.types import Operator
 
-from .. import constants as const
+from .. import global_variables as gv
 
 UPDATE_INTERVAL = 24
 UPDATE_TIMEOUT = 5
@@ -29,7 +29,7 @@ def _version_compare(installed_v, update_v):
 
 
 def _has_time_elapsed():
-    pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
+    pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
     if pref.last_update_check == "Never":
         return True
 
@@ -43,17 +43,17 @@ def _has_time_elapsed():
 
 
 def update_checker():
-    pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
+    pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
     wm = bpy.context.window_manager
     gbh_update = wm.gbh_update
 
     try:
-        res = requests.get(const.URL_UPDATE, timeout=UPDATE_TIMEOUT)
+        res = requests.get(gv.URL_UPDATE, timeout=UPDATE_TIMEOUT)
         if not res.ok:
             gbh_update.update_report = UPDATE_INTERNET_FAIL
             return
         else:
-            response = requests.get(const.URL_UPDATE)
+            response = requests.get(gv.URL_UPDATE)
 
     except requests.exceptions.RequestException as err:
         print(err)
@@ -121,7 +121,7 @@ def register():
     for cls in classes:
         register_class(cls)
 
-    pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
+    pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
     if not _version_compare(GBH_VERSION.split("."), pref.update_latest_version.split(".")):
         pref.update_available = False
 

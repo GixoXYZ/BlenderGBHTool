@@ -4,7 +4,7 @@ import os
 import bpy
 from bpy.utils import previews
 
-from .constants import GBH_PACKAGE
+from .global_variables import GBH_PACKAGE
 
 _preview_collections = {}
 

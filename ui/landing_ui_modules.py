@@ -2,7 +2,7 @@
 
 from bpy.types import UIList
 
-from .. constants import LIST_ROWS
+from ..global_variables import LIST_ROWS
 from . common_ui import clear_pointer_if_object_deleted
 
 

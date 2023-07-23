@@ -6,7 +6,7 @@ import platform
 from bpy.types import Operator
 from bpy.props import StringProperty
 
-from .. constants import INVALID_PATH
+from ..global_variables import INVALID_PATH
 
 
 class GBH_OT_open_folder(Operator):

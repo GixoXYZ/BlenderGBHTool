@@ -5,7 +5,7 @@ import os
 from bpy.types import Operator
 
 from . import common_functions as cf
-from .. constants import DIR_PRESETS
+from ..global_variables import DIR_PRESETS
 
 MAX_PRESET = 150
 

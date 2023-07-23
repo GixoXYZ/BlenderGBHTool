@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from . common_ui import multi_line_text
-from .. import constants as const
+from .. import global_variables as gv
 
 
 def update_version_info(context, layout):
-    pref = context.preferences.addons[const.GBH_PACKAGE].preferences
+    pref = context.preferences.addons[gv.GBH_PACKAGE].preferences
     lv = pref.update_latest_version
     rt = pref.update_release_type
     bv = pref.update_blender_version
@@ -22,7 +22,7 @@ def update_version_info(context, layout):
 
 
 def update_message(context, layout):
-    pref = context.preferences.addons[const.GBH_PACKAGE].preferences
+    pref = context.preferences.addons[gv.GBH_PACKAGE].preferences
     um = pref.update_message
 
     if um != "":
@@ -36,7 +36,7 @@ def update_message(context, layout):
 
 
 def update_changelog(context, layout):
-    pref = context.preferences.addons[const.GBH_PACKAGE].preferences
+    pref = context.preferences.addons[gv.GBH_PACKAGE].preferences
 
     if pref.update_changelog != "":
         box = layout.box()
@@ -58,4 +58,4 @@ def update_download(context, layout):
         "wm.url_open",
         icon="IMPORT",
         text="Download"
-    ).url = const.URL_GUMROAD
+    ).url = gv.URL_GUMROAD

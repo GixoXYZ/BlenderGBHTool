@@ -2,14 +2,14 @@
 
 from bpy.types import Menu
 import bpy
-from .. import constants as const
+from .. import global_variables as gv
 
 
 class VIEW3D_MT_PIE_gbh_panel_toggle(Menu):
     bl_label = "Screen Area Tiling"
 
     def draw(self, context):
-        pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
+        pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
         layout = self.layout
 
         pie = layout.menu_pie()

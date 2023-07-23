@@ -4,7 +4,7 @@ import bpy
 import os
 from bpy.types import Operator
 
-from .. constants import DIR_ASSETS, PRE_MADE_NODES_FILE
+from ..global_variables import DIR_ASSETS, PRE_MADE_NODES_FILE
 from . import common_functions as cf
 
 

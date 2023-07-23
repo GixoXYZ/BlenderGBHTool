@@ -4,13 +4,13 @@ import bpy
 from bpy.types import Operator
 from bpy.props import StringProperty, BoolProperty
 
-from .. import constants as const
+from .. import global_variables as gv
 
 addon_keymaps = []
 
 
 def add_hotkey():
-    pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
+    pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
 

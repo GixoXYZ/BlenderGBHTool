@@ -5,7 +5,7 @@ from bpy.types import Panel
 
 from . import node_groups_ui_modules as modules
 from . common_ui import GBHBasePanel
-from .. constants import LIST_ROWS
+from ..global_variables import LIST_ROWS
 
 
 class VIEW3D_PT_ng_ui_main(Panel, GBHBasePanel):

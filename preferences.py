@@ -12,7 +12,7 @@ from bpy.props import (
 
 from . ui.common_ui import multi_line_text
 from . icons import load_icons
-from . import constants as const
+from . import global_variables as gv
 from . operators.ui_ops import add_hotkey, remove_hotkey
 
 
@@ -356,7 +356,7 @@ class GBHPreferences(AddonPreferences):
                 "wm.url_open",
                 icon="IMPORT",
                 text="Download"
-            ).url = const.URL_DOCS
+            ).url = gv.URL_DOCS
 
         else:
             row.operator("gbh.update_check", icon="FILE_REFRESH")
@@ -439,17 +439,17 @@ class GBHPreferences(AddonPreferences):
             "gbh.open_folder",
             text="Open Presets Folder",
             icon="PRESET"
-        ).path = const.DIR_PRESETS
+        ).path = gv.DIR_PRESETS
         col.operator(
             "gbh.open_folder",
             text="Open Library Folder",
             icon="ASSET_MANAGER"
-        ).path = const.DIR_LIBRARY
+        ).path = gv.DIR_LIBRARY
         col.operator(
             "gbh.open_folder",
             text="Open Textures Folder",
             icon="TEXTURE"
-        ).path = const.DIR_TEXTURES
+        ).path = gv.DIR_TEXTURES
 
 
 classes = (

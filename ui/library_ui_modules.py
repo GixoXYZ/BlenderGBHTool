@@ -4,7 +4,7 @@ import bpy
 import math
 
 from .. icons import get_icons
-from .. constants import GBH_PACKAGE
+from ..global_variables import GBH_PACKAGE
 from .. operators import library_ops as lib_ops
 
 

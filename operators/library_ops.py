@@ -8,7 +8,7 @@ from bpy.app.handlers import persistent
 from bpy.types import Operator
 from bpy.props import IntProperty, StringProperty
 
-from .. import constants as const
+from .. import global_variables as gv
 from . import common_functions as cf
 
 
@@ -38,7 +38,7 @@ def get_blend_files():
 
 @persistent
 def load_library(self, context):
-    pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
+    pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
     wm = bpy.context.window_manager
     gbh_lib = wm.gbh_lib
 
@@ -50,10 +50,10 @@ def load_library(self, context):
     _filtered_node_groups_collection.clear()
 
     if gbh_lib.lib_category == "GBH":
-        gbh_lib.lib_path = const.DIR_LIBRARY
+        gbh_lib.lib_path = gv.DIR_LIBRARY
 
     elif gbh_lib.lib_category == "BLENDER":
-        gbh_lib.lib_path = const.DIR_BLENDER_ASSETS
+        gbh_lib.lib_path = gv.DIR_BLENDER_ASSETS
 
     elif gbh_lib.lib_category == "USER":
         gbh_lib.lib_path = pref.lib_user_folder
@@ -62,7 +62,7 @@ def load_library(self, context):
         _load_blend_file(gbh_lib.lib_path)
 
     else:
-        return True, const.INVALID_PATH
+        return True, gv.INVALID_PATH
 
     if not _blends_collection:
         return True, NO_BLEND_FILE
@@ -239,7 +239,7 @@ class GBH_OT_node_group_add_to_object(Operator):
 
     def execute(self, context):
         scene = context.scene
-        pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
+        pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
 
         if not pref.lib_add_to_active_object and scene.hair_object:
             obj = scene.hair_object
@@ -369,7 +369,7 @@ class GBH_OT_close_user_lib(Operator):
     bl_description = "Close user's library and clear user's items from list"
 
     def execute(self, context):
-        pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
+        pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
 
         # Clear listed items
         _blends_collection.clear()
@@ -394,7 +394,7 @@ class GBH_OT_open_user_file(Operator):
     )
 
     def execute(self, context):
-        pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
+        pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
 
         user_lib_path = pref.lib_user_folder
         file_path = os.path.join(user_lib_path, self.filename)

@@ -8,7 +8,7 @@ import math
 from bpy.types import Operator
 from bpy.props import StringProperty
 
-from .. import constants as const
+from .. import global_variables as gv
 from . import common_functions as cf
 
 
@@ -67,7 +67,7 @@ def _connect_compositor_nodes(context, render_layers_node, file_output_node):
     tree = scene.node_tree
     wm = context.window_manager
     gbh_hair_card = wm.gbh_hair_card
-    pref = context.preferences.addons[const.GBH_PACKAGE].preferences
+    pref = context.preferences.addons[gv.GBH_PACKAGE].preferences
     # Set output name
     output_name = gbh_hair_card.hc_output_name
     if output_name == "":
@@ -376,7 +376,7 @@ class GBH_OT_render(Operator):
     def execute(self, context):
         wm = context.window_manager
         gbh_hair_card = wm.gbh_hair_card
-        pref = context.preferences.addons[const.GBH_PACKAGE].preferences
+        pref = context.preferences.addons[gv.GBH_PACKAGE].preferences
         scene = context.scene
         tree = scene.node_tree
         node = next(
@@ -385,7 +385,7 @@ class GBH_OT_render(Operator):
         )
         directory_path = node.base_path
         if not cf.directory_check(directory_path):
-            err = const.INVALID_PATH
+            err = gv.INVALID_PATH
             self.report({"ERROR"}, err)
             return {"CANCELLED"}
 

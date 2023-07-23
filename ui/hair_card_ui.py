@@ -3,7 +3,7 @@
 import bpy
 from bpy.types import Panel
 
-from .. constants import GBH_PACKAGE
+from ..global_variables import GBH_PACKAGE
 from . common_ui import GBHBasePanel
 from . import hair_card_modules as modules
 

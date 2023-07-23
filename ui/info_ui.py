@@ -3,7 +3,7 @@
 from bpy.types import Panel
 
 from . common_ui import GBHBasePanel
-from .. import constants as const
+from .. import global_variables as gv
 from . import info_ui_modules as modules
 
 
@@ -16,7 +16,7 @@ class VIEW3D_PT_info_ui_main(Panel, GBHBasePanel):
     def poll(cls, context):
         wm = context.window_manager
         gbh_panels = wm.gbh_panels
-        pref = context.preferences.addons[const.GBH_PACKAGE].preferences
+        pref = context.preferences.addons[gv.GBH_PACKAGE].preferences
         return pref.panel_info_switch and gbh_panels.panel_info_switch
 
     def draw_header(self, context):
@@ -31,11 +31,11 @@ class VIEW3D_PT_info_ui_main(Panel, GBHBasePanel):
         col.label(text="Links")
 
         links = {
-            "Docs": {"url": const.URL_DOCS, "icon": "Docs"},
-            "YouTube": {"url": const.URL_YOUTUBE, "icon": "YouTube"},
-            "Twitter": {"url": const.URL_TWITTER, "icon": "Twitter"},
-            "Discord": {"url": const.URL_DISCORD, "icon": "Discord"},
-            "Gumroad": {"url": const.URL_GUMROAD, "icon": "Gumroad"},
+            "Docs": {"url": gv.URL_DOCS, "icon": "Docs"},
+            "YouTube": {"url": gv.URL_YOUTUBE, "icon": "YouTube"},
+            "Twitter": {"url": gv.URL_TWITTER, "icon": "Twitter"},
+            "Discord": {"url": gv.URL_DISCORD, "icon": "Discord"},
+            "Gumroad": {"url": gv.URL_GUMROAD, "icon": "Gumroad"},
         }
 
         buttons = [
