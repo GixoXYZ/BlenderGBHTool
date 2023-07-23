@@ -9,10 +9,15 @@ GBH_VERSION = None
 
 # URLs
 URL_DOCS = "https://notgixo.github.io/GBHToolDocs/"
+URL_CONTACT = "https://notgixo.github.io"
+URL_GITHUB = "https://github.com/notgixo/BlenderGBHTool"
+URL_GUMROAD = "https://gixo.gumroad.com/l/GBHTool"
+URL_ISSUE = "https://github.com/notgixo/BlenderGBHTool/issues/new"
+
+
 URL_YOUTUBE = "https://www.youtube.com/playlist?list=PLFexHVb3hTS5wZYhBsFuzS574-5uv1RZ5"
 URL_TWITTER = "https://twitter.com/notGixo"
 URL_DISCORD = "https://discord.com/invite/TxTpJ8FQaz"
-URL_GUMROAD = "https://gixo.gumroad.com/l/GBHTool"
 
 
 # Directories

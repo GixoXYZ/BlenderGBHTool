@@ -32,23 +32,14 @@ class VIEW3D_PT_info_ui_main(Panel, GBHBasePanel):
 
         links = {
             "Docs": {"url": gv.URL_DOCS, "icon": "Docs"},
-            "YouTube": {"url": gv.URL_YOUTUBE, "icon": "YouTube"},
-            "Twitter": {"url": gv.URL_TWITTER, "icon": "Twitter"},
-            "Discord": {"url": gv.URL_DISCORD, "icon": "Discord"},
+            "Contact": {"url": gv.URL_CONTACT, "icon": "Contact"},
             "Gumroad": {"url": gv.URL_GUMROAD, "icon": "Gumroad"},
+            "Github": {"url": gv.URL_GITHUB, "icon": "Github"},
+            "Report Problems": {"url": gv.URL_ISSUE, "icon": "Issue"},
         }
 
-        buttons = [
-            "Docs",
-            "YouTube",
-            "Twitter",
-            "Discord",
-            "Gumroad",
-        ]
-
-        for button in buttons:
-            button_data = links[button]
-            modules.info_button(context, col, button,
+        for key, button_data in links.items():
+            modules.info_button(context, col, key,
                                 button_data["icon"], button_data["url"])
 
         box = layout.box()
