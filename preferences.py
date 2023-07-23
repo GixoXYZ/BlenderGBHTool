@@ -418,6 +418,21 @@ class GBHPreferences(AddonPreferences):
         row = box.row()
         row.label(text="Library Items Per Page:")
         row.prop(self, "lib_item_per_page", text="")
+        gbh_library = bpy.context.preferences.filepaths.asset_libraries.get("GBH Library")
+        if not gbh_library:
+            row = box.row()
+            row.operator(
+                "gbh.gbh_to_asset_browser",
+                icon="ADD"
+            ).add = True
+
+        if gbh_library:
+            row = box.row()
+            row.operator(
+                "gbh.gbh_to_asset_browser",
+                text="Remove GBH Assets from Blender's Asset Browser",
+                icon="REMOVE"
+            ).add = False
 
         box = layout.box()
         split = box.split()

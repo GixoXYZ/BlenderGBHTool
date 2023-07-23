@@ -6,7 +6,7 @@ import subprocess
 import re
 from bpy.app.handlers import persistent
 from bpy.types import Operator
-from bpy.props import IntProperty, StringProperty
+from bpy.props import IntProperty, StringProperty, BoolProperty
 
 from .. import global_variables as gv
 from . import common_functions as cf
@@ -435,6 +435,32 @@ class GBH_OT_change_lib_page(Operator):
         return {"FINISHED"}
 
 
+class GBH_OT_gbh_to_asset_browser(Operator):
+    bl_idname = "gbh.gbh_to_asset_browser"
+    bl_label = "Add GBH Assets to Blender's Asset Browser"
+    bl_description = "Adds GBH Tool library assets to Blender's asset browser file paths."
+
+    add: BoolProperty(
+        default=True
+    )
+
+    def execute(self, context):
+        asset_libraries = bpy.context.preferences.filepaths.asset_libraries
+        if self.add:
+            if "GBH Library" not in asset_libraries:
+                bpy.ops.preferences.asset_library_add(
+                    directory=gv.DIR_LIBRARY,
+                )
+                bpy.context.preferences.filepaths.asset_libraries[-1].name = "GBH Library"
+        else:
+            index = next((index for index, item in enumerate(asset_libraries) if item.name == "GBH Library"))
+            bpy.ops.preferences.asset_library_remove(
+                index=index
+            )
+
+        return {"FINISHED"}
+
+
 classes = (
     GBH_OT_reload_library,
     GBH_OT_node_group_append,
@@ -446,6 +472,7 @@ classes = (
     GBH_OT_close_user_lib,
     GBH_OT_open_user_file,
     GBH_OT_change_lib_page,
+    GBH_OT_gbh_to_asset_browser,
 )
 
 
