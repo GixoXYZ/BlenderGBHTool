@@ -109,7 +109,7 @@ def info_pitfalls(layout, context):
             parent=box
         )
 
-    # Particle system info section
+    # Rendering info section
     title = "Rendering"
     sub_panel = box_sub_panel(
         layout,
@@ -126,6 +126,29 @@ def info_pitfalls(layout, context):
         col.label(text="Black artifact when rendering hair cards?", icon="INFO")
         box = body.box()
         text1 = '- This is caused by insufficient light bounces for transparent objects. To fix this issue head to "Render Properties -> Light Paths -> Max Bounces" and then increase "Transparent" value.'
+        multi_line_text(
+            context=context,
+            text=text1,
+            parent=box
+        )
+
+    # Rig info section
+    title = "Rig"
+    sub_panel = box_sub_panel(
+        layout,
+        "GROUP_BONE",
+        title,
+        gbh_info,
+        "info_rig",
+        False
+    )
+    if sub_panel[0]:
+        body = sub_panel[2]
+
+        col = body.column()
+        col.label(text="Automatic weight paint behaves unexpectedly?", icon="INFO")
+        box = body.box()
+        text1 = '- This is could be caused by flipped normals. Add "GBG Flip Faces" node group from the library to the hair object and things should start to behave as expected.'
         multi_line_text(
             context=context,
             text=text1,
