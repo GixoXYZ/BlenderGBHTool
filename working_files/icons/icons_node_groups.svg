@@ -7,9 +7,9 @@
    viewBox="0 0 17.066667 17.066667"
    version="1.1"
    id="svg5"
-   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    sodipodi:docname="icons_node_groups.svg"
-   inkscape:export-filename="..\GBHTool\icons\white\Node Group.png"
+   inkscape:export-filename="..\..\icons\black\Flip Faces.png"
    inkscape:export-xdpi="24"
    inkscape:export-ydpi="24"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -28,14 +28,15 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="1.4142136"
-     inkscape:cx="53.386561"
-     inkscape:cy="300.52037"
+     inkscape:cx="186.32263"
+     inkscape:cy="279.30717"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-x="0"
+     inkscape:window-y="34"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer18" />
+     inkscape:current-layer="g4"
+     inkscape:pageshadow="2" />
   <defs
      id="defs2">
     <inkscape:path-effect
@@ -71,7 +72,8 @@
        apply_no_radius="true"
        apply_with_radius="true"
        only_selected="false"
-       hide_knots="false" />
+       hide_knots="false"
+       satellites_param="F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1" />
     <inkscape:path-effect
        effect="fillet_chamfer"
        id="path-effect6326"
@@ -139,7 +141,8 @@
        apply_no_radius="true"
        apply_with_radius="true"
        only_selected="false"
-       hide_knots="false" />
+       hide_knots="false"
+       satellites_param="F,0,0,1,0,1.3229167,0,1 @ F,0,0,1,0,1.3229167,0,1 @ F,0,0,1,0,1.3229167,0,1 @ F,0,0,1,0,1.3229167,0,1" />
     <inkscape:path-effect
        effect="fillet_chamfer"
        id="path-effect5093"
@@ -292,7 +295,8 @@
        apply_no_radius="true"
        apply_with_radius="true"
        only_selected="false"
-       hide_knots="false" />
+       hide_knots="false"
+       satellites_param="F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1" />
     <inkscape:path-effect
        effect="fillet_chamfer"
        id="path-effect296"
@@ -1556,6 +1560,31 @@
        id="rect2903"
        style="display:inline;fill:none;stroke:#f9f7fd;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
        d="M 8.0445277,5.9290302 10.98949,8.8739931 8.053089,11.810395"
+       sodipodi:nodetypes="ccc"
+       inkscape:label="Arrow Head" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g4"
+     inkscape:label="GBH Flip Faces"
+     transform="translate(-0.87232095,0.1353524)"
+     style="display:none">
+    <path
+       id="path1"
+       style="display:inline;fill:none;stroke:#4772b3;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       d="M 6.068079,7.7797629 V 2.7989292 h 8.911792 V 13.997033 H 6.069764 l -5.617e-4,-2.733656"
+       sodipodi:nodetypes="cccccc"
+       inkscape:label="Square" />
+    <path
+       style="display:inline;fill:none;stroke:#000000;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 3.8314379,8.1280584 0.7985326,1.408321 h 5.1877626"
+       id="path3"
+       inkscape:label="Arrow Body"
+       sodipodi:nodetypes="ccc" />
+    <path
+       id="path4"
+       style="display:inline;fill:none;stroke:#000000;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       d="M 8.0445277,6.5956972 10.98949,9.5406601 8.053089,12.477065"
        sodipodi:nodetypes="ccc"
        inkscape:label="Arrow Head" />
   </g>
