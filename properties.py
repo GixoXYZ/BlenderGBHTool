@@ -287,7 +287,99 @@ class GBH_RigProperties(PropertyGroup):
         default=False,
         update=_rig_bool_update,
     )
-    rig_not_used: StringProperty()
+    rig_not_used_mods: StringProperty()
+
+    rig_weight_paint: BoolProperty(
+        name="Minimize/Maximize Weight Paint",
+        default=True,
+    )
+    wp_clear_from_roots_switch: BoolProperty(
+        name="Clear Weight Paint from Root",
+        default=False,
+    )
+    wp_clear_from_roots_distance: FloatProperty(
+        name="Distance from Root (cm)",
+        default=5,
+        soft_max=100,
+        min=0,
+    )
+    wp_fix_braids_switch: BoolProperty(
+        name="Fix Braids",
+    )
+    wp_tweak_levels_switch: BoolProperty(
+        name="Tweak Levels",
+    )
+    wp_levels_offset: FloatProperty(
+        name="Offset",
+        default=0.1,
+        max=1,
+        min=-1,
+    )
+    wp_level_gain: FloatProperty(
+        name="Gain",
+        default=1,
+        soft_max=10,
+        min=0,
+    )
+    wp_smooth_switch: BoolProperty(
+        name="Smooth Weights",
+    )
+    wp_smooth_factor: FloatProperty(
+        name="Factor",
+        default=0.5,
+        max=1,
+        min=0,
+    )
+    wp_smooth_iterations: IntProperty(
+        name="Iterations",
+        default=5,
+        soft_max=200,
+        min=1,
+    )
+    wp_smooth_expand: FloatProperty(
+        name="Expand/Contract",
+        default=1,
+        max=1,
+        min=-1,
+    )
+    # Add update method.
+    wp_pie_quantize_steps: IntProperty(
+        name="Offset",
+        default=1,
+        max=1000,
+        soft_max=100,
+        min=1,
+    )
+    wp_pie_levels_offset: FloatProperty(
+        name="Offset",
+        default=0.1,
+        max=1,
+        min=-1,
+    )
+    wp_pie_level_gain: FloatProperty(
+        name="Gain",
+        default=1,
+        soft_max=10,
+        min=0,
+    )
+    wp_pie_smooth_factor: FloatProperty(
+        name="Factor",
+        default=0.01,
+        max=1,
+        min=0,
+    )
+    wp_pie_smooth_iterations: IntProperty(
+        name="Iterations",
+        default=5,
+        soft_max=200,
+        min=1,
+    )
+    wp_pie_smooth_expand: FloatProperty(
+        name="Expand/Contract",
+        default=1,
+        max=1,
+        min=-1,
+    )
 
 
 class GBH_ConvertProperties(PropertyGroup):
@@ -372,6 +464,10 @@ class GBH_InfoProperties(PropertyGroup):
     )
     info_rendering: BoolProperty(
         name="Minimize/Maximize Rendering Info Section",
+        default=False,
+    )
+    info_rig: BoolProperty(
+        name="Minimize/Maximize Rig Info Section",
         default=False,
     )
 

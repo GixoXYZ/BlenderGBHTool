@@ -37,7 +37,7 @@ def rig_armature_creation(layout, context):
                     gbh_rig,
                     "rig_density",
                     text="Density of Bone Chains(%)",
-                    slider=True
+                    slider=True,
                 )
                 if gbh_rig.rig_reverse:
                     icon = "SORT_ASC"
@@ -100,7 +100,7 @@ def rig_armature_creation(layout, context):
                     icon="INFO"
                 )
                 if gbh_rig.rig_use_mods:
-                    unused_mods = eval(gbh_rig.rig_not_used)
+                    unused_mods = eval(gbh_rig.rig_not_used_mods)
                     if unused_mods:
                         for mod in unused_mods:
                             col = box.column()
@@ -112,6 +112,103 @@ def rig_armature_creation(layout, context):
             if not existing_armature:
                 col = body.column()
                 col.operator("gbh.hair_to_armature", text="Generate Armature")
+
+        if not scene.hair_object:
+            row = body.row()
+            row.label(text="Please select a hair object.", icon="INFO")
+
+
+def rig_weight_paint(layout, context):
+    scene = context.scene
+    wm = context.window_manager
+    gbh_rig = wm.gbh_rig
+    title = "Weight Paint"
+    sub_panel = box_sub_panel(
+        layout,
+        "WPAINT_HLT",
+        title,
+        gbh_rig,
+        "rig_weight_paint",
+        False
+    )
+    if sub_panel[0]:
+        body = sub_panel[2]
+        if scene.hair_object:
+
+            armature_name = f"{scene.hair_object.name}_Armature"
+            existing_armature = bpy.data.objects.get(armature_name)
+
+            if existing_armature:
+                box = body.box()
+                col = box.column()
+                col.label(text="Clear Weight Paint from Roots")
+                col.prop(
+                    gbh_rig,
+                    "wp_clear_from_roots_switch",
+                )
+                col = box.column()
+                col.enabled = gbh_rig.wp_clear_from_roots_switch
+                col.prop(
+                    gbh_rig,
+                    "wp_clear_from_roots_distance",
+                )
+
+                box = body.box()
+                col = box.column()
+                col.label(text="Levels")
+
+                col.prop(
+                    gbh_rig,
+                    "wp_tweak_levels_switch",
+                )
+                col = box.column()
+                col.enabled = gbh_rig.wp_tweak_levels_switch
+                col.prop(
+                    gbh_rig,
+                    "wp_levels_offset",
+                )
+                col.prop(
+                    gbh_rig,
+                    "wp_level_gain",
+                    slider=True,
+                )
+
+                box = body.box()
+                col = box.column()
+                col.label(text="Smoothing")
+
+                col.prop(
+                    gbh_rig,
+                    "wp_smooth_switch",
+                )
+                col = box.column()
+                col.enabled = gbh_rig.wp_smooth_switch
+                col.prop(
+                    gbh_rig,
+                    "wp_smooth_factor",
+                    slider=True,
+                )
+                col.prop(
+                    gbh_rig,
+                    "wp_smooth_iterations",
+                )
+                col.prop(
+                    gbh_rig,
+                    "wp_smooth_expand",
+                )
+
+                box = body.box()
+                col = box.column()
+                if gbh_rig.rig_use_mods:
+                    col.prop(
+                        gbh_rig,
+                        "wp_fix_braids_switch",
+                    )
+                col.operator("gbh.automatic_weight_paint")
+
+            if not existing_armature:
+                row = body.row()
+                row.label(text="Please generate armature first.", icon="INFO")
 
         if not scene.hair_object:
             row = body.row()

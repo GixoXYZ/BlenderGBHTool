@@ -140,6 +140,9 @@ def delete_item(data_item):
     elif data_type == "Camera":
         data_list = bpy.data.cameras
 
+    elif data_type == "Armature":
+        data_list = bpy.data.armatures
+
     elif data_type in light_types:
         data_list = bpy.data.lights
 

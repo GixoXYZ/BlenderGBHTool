@@ -25,6 +25,7 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
     def draw(self, context):
         layout = self.layout
         modules.rig_armature_creation(layout, context)
+        modules.rig_weight_paint(layout, context)
 
 
 classes = (
