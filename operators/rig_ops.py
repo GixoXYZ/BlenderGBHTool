@@ -41,19 +41,14 @@ def _rename_bones(scene, context, armature_name):
     gbh_rig = wm.gbh_rig
 
     bones = bpy.data.armatures[armature_name].bones
-    root_bones = []
-    for bone in bones:
-        if not bone.parent:
-            root_bones.append(bone)
+    root_bones = [bone for bone in bones if not bone.parent]
 
-    chain_index = 1
-    for root_bone in root_bones:
+    for chain_index, root_bone in enumerate(root_bones, start=1):
         bone_index = 1
         root_bone.name = f"{gbh_rig.arm_name_chain}{chain_index}{gbh_rig.arm_name_separator}{gbh_rig.arm_name_bone}{bone_index}"
         for bone in root_bone.children_recursive:
             bone.name = f"{gbh_rig.arm_name_chain}{chain_index}{gbh_rig.arm_name_separator}{gbh_rig.arm_name_bone}{bone_index + 1}"
             bone_index += 1
-        chain_index += 1
 
 
 def _apply_skin_modifier(context, new_object, armature_name):
