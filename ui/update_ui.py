@@ -4,7 +4,7 @@ from bpy.types import Panel
 
 from ..global_variables import GBH_PACKAGE
 from . common_ui import GBHBasePanel
-from . import update_ui_modules as modules
+from .. import global_variables as gv
 
 
 class VIEW3D_PT_update_ui_main(Panel, GBHBasePanel):
@@ -24,7 +24,21 @@ class VIEW3D_PT_update_ui_main(Panel, GBHBasePanel):
     def draw(self, context):
         layout = self.layout
         box = layout.box()
-        modules.update_download(context, box)
+        self._update_download(context, box)
+
+    def _update_download(self, context, layout):
+        pref = context.preferences.addons[gv.GBH_PACKAGE].preferences
+        col = layout.column()
+        col.operator(
+            "wm.url_open",
+            icon="IMPORT",
+            text=f"Download GBH Tool {pref.update_latest_version}"
+        ).url = gv.update_url
+        col.operator(
+            "wm.url_open",
+            icon="INFO",
+            text="Changelog"
+        ).url = gv.update_info_url
 
 
 classes = (

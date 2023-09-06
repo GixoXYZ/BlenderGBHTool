@@ -33,9 +33,7 @@ if "bpy" in locals():
     importlib.reload(hair_card_ops)
     importlib.reload(ui_ops)
     importlib.reload(update_ui)
-    importlib.reload(landing_ui_modules)
     importlib.reload(landing_ui)
-    importlib.reload(node_groups_ui_modules)
     importlib.reload(node_groups_ui)
     importlib.reload(library_ui)
     importlib.reload(hair_card_ui)
@@ -49,11 +47,9 @@ else:
     from .ui import (
         hair_card_ui,
         info_ui,
-        landing_ui_modules,
         landing_ui,
         library_ui,
         convert_ui,
-        node_groups_ui_modules,
         node_groups_ui,
         rig_ui,
         update_ui,
@@ -90,9 +86,7 @@ modules = [
     hair_card_ops,
     ui_ops,
     update_ui,
-    landing_ui_modules,
     landing_ui,
-    node_groups_ui_modules,
     node_groups_ui,
     library_ui,
     hair_card_ui,
@@ -107,6 +101,7 @@ modules = [
 def register():
 
     gv.GBH_VERSION = list(bl_info["version"])
+    # TODO: Remove debugging prints.
     print(gv.GBH_VERSION)
 
     for module in modules:

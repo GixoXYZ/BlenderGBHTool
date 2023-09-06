@@ -304,7 +304,7 @@ class GBH_RigProperties(PropertyGroup):
         min=0,
     )
     wp_fix_braids_switch: BoolProperty(
-        name="Fix Braids",
+        name="Fix Braids Mesh",
     )
     wp_tweak_levels_switch: BoolProperty(
         name="Tweak Levels",
@@ -337,44 +337,6 @@ class GBH_RigProperties(PropertyGroup):
         min=1,
     )
     wp_smooth_expand: FloatProperty(
-        name="Expand/Contract",
-        default=1,
-        max=1,
-        min=-1,
-    )
-    # Add update method.
-    wp_pie_quantize_steps: IntProperty(
-        name="Offset",
-        default=1,
-        max=1000,
-        soft_max=100,
-        min=1,
-    )
-    wp_pie_levels_offset: FloatProperty(
-        name="Offset",
-        default=0.1,
-        max=1,
-        min=-1,
-    )
-    wp_pie_level_gain: FloatProperty(
-        name="Gain",
-        default=1,
-        soft_max=10,
-        min=0,
-    )
-    wp_pie_smooth_factor: FloatProperty(
-        name="Factor",
-        default=0.01,
-        max=1,
-        min=0,
-    )
-    wp_pie_smooth_iterations: IntProperty(
-        name="Iterations",
-        default=5,
-        soft_max=200,
-        min=1,
-    )
-    wp_pie_smooth_expand: FloatProperty(
         name="Expand/Contract",
         default=1,
         max=1,
