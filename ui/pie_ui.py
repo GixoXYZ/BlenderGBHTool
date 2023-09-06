@@ -52,6 +52,7 @@ class VIEW3D_MT_PIE_gbh_panel_toggle(Menu):
 class VIEW3D_MT_PIE_gbh_rig(Menu):
     bl_label = "GBH Tool"
 
+    # TODO: Test rig pie menu in different scenarios.
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
@@ -70,7 +71,7 @@ class VIEW3D_MT_PIE_gbh_rig(Menu):
         box.label(text="Selection")
         col = box.column()
         col.scale_y = 1.3
-        col.operator("gbh.select_similar_bones")
+        col.operator("gbh.select_similar_bones", text="Select Similar Bones by Name")
         col.operator("gbh.select_all_bones")
 
         try:

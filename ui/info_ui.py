@@ -27,7 +27,6 @@ class VIEW3D_PT_info_ui_main(Panel, GBHBasePanel):
 
         box = layout.box()
         col = box.column()
-        # col.operator("gbh.testing")
         col.label(text="Links")
 
         links = {

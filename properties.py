@@ -61,7 +61,7 @@ def _lib_search_update(self, context):
 def _arm_update(self, context):
     wm = context.window_manager
     gbh_rig = wm.gbh_rig
-    if gbh_rig.rig_live_preview:
+    if gbh_rig.arm_live_preview:
         bpy.ops.gbh.hair_to_armature()
 
 
@@ -211,7 +211,39 @@ class GBH_RigProperties(PropertyGroup):
         name="Minimize/Maximize Armature Creation",
         default=True,
     )
-    rig_live_preview: BoolProperty(
+    arm_display_type: EnumProperty(
+        name="Display Armature As",
+        description="Change bones display type in the 3d viewport.",
+        items=[
+            ("OCTAHEDRAL", "Octahedral", ""),
+            ("STICK", "Stick", ""),
+            ("BBONE", "B-Bone", ""),
+            ("ENVELOPE", "Envelope", ""),
+            ("WIRE", "Wire", ""),
+        ],
+        update=_arm_update,
+    )
+    arm_name_chain: StringProperty(
+        name="Chain Name",
+        default="Hair",
+        update=_arm_update,
+    )
+    arm_name_bone: StringProperty(
+        name="Bone Name",
+        default="Bone",
+        update=_arm_update,
+    )
+    arm_name_separator: StringProperty(
+        name="Separator",
+        default="_",
+        update=_arm_update,
+    )
+    arm_name_parent_bone: StringProperty(
+        name="Parent Bone Name",
+        default="Parent_Bone",
+        update=_arm_update,
+    )
+    arm_live_preview: BoolProperty(
         name="Live Preview",
         description="Show live preview of bones",
         default=True,
@@ -275,7 +307,7 @@ class GBH_RigProperties(PropertyGroup):
     )
     arm_not_used_mods: StringProperty()
 
-    rig_weight_paint: BoolProperty(
+    arm_weight_paint: BoolProperty(
         name="Minimize/Maximize Weight Paint",
         default=True,
     )

@@ -25,7 +25,7 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
     def draw(self, context):
         layout = self.layout
         self._rig_armature_creation(layout, context)
-        self._rig_weight_paint(layout, context)
+        self._arm_weight_paint(layout, context)
 
     def _rig_armature_creation(self, layout, context):
         scene = context.scene
@@ -59,44 +59,58 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
             col.label(text="Properties")
             col.prop(
                 gbh_rig,
-                "rig_res",
+                "arm_res",
                 text="Number of Bones in Each Chain"
             )
             col.prop(
                 gbh_rig,
-                "rig_density",
+                "arm_density",
                 text="Density of Bone Chains(%)",
                 slider=True,
             )
 
-            icon = "SORT_ASC" if gbh_rig.rig_reverse else "SORT_DESC"
+            icon = "SORT_ASC" if gbh_rig.arm_reverse else "SORT_DESC"
 
             col.prop(
                 gbh_rig,
-                "rig_reverse",
+                "arm_reverse",
                 text="Reverse Chains Direction",
                 icon=icon
             )
             col = box.column()
             col.prop(
                 gbh_rig,
-                "rig_add_parent_bone",
+                "arm_add_parent_bone",
                 text="Add Parent Bone",
                 icon="BONE_DATA"
             )
-            if gbh_rig.rig_add_parent_bone:
-                col.prop(gbh_rig, "rig_parent_size")
+            if gbh_rig.arm_add_parent_bone:
+                col.prop(gbh_rig, "arm_parent_size")
+                col.label(text="Parent Bone Name")
+                col.prop(gbh_rig, "arm_name_parent_bone", text="")
 
             col = box.column(align=True)
-            col.prop(gbh_rig, "rig_start", text="Chains Start Point Trim")
-            col.prop(gbh_rig, "rig_end", text="Chains End Point Trim")
+            col.prop(gbh_rig, "arm_start", text="Chains Start Point Trim")
+            col.prop(gbh_rig, "arm_end", text="Chains End Point Trim")
 
             box = body.box()
             col = box.column()
-            icon = "RADIOBUT_ON" if gbh_rig.rig_live_preview else "RADIOBUT_OFF"
+            col.label(text="Armature Naming Scheme")
+            col.prop(gbh_rig, "arm_name_chain")
+            col.prop(gbh_rig, "arm_name_bone")
+            col.prop(gbh_rig, "arm_name_separator")
+
+            box = body.box()
+            col = box.column()
+            col.label(text="Displays Armature As")
+            col.prop(gbh_rig, "arm_display_type", text="")
+
+            box = body.box()
+            col = box.column()
+            icon = "RADIOBUT_ON" if gbh_rig.arm_live_preview else "RADIOBUT_OFF"
             col.prop(
                 gbh_rig,
-                "rig_live_preview",
+                "arm_live_preview",
                 text="Live Preview",
                 icon=icon
             )
@@ -104,10 +118,10 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
 
             box = body.box()
             col = box.column()
-            icon = "MODIFIER" if gbh_rig.rig_use_mods else "MODIFIER_DATA"
+            icon = "MODIFIER" if gbh_rig.arm_use_mods else "MODIFIER_DATA"
             col.prop(
                 gbh_rig,
-                "rig_use_mods",
+                "arm_use_mods",
                 text="Use Hair Object's Modifiers",
                 icon=icon
             )
@@ -116,9 +130,9 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
                 icon="INFO"
             )
 
-            if not gbh_rig.rig_use_mods:
+            if not gbh_rig.arm_use_mods:
                 return
-            if unused_mods := eval(gbh_rig.rig_not_used_mods):
+            if unused_mods := eval(gbh_rig.arm_not_used_mods):
                 for mod in unused_mods:
                     col = box.column()
                     col.label(
@@ -126,7 +140,7 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
                         icon="DOT"
                     )
 
-    def _rig_weight_paint(self, layout, context):
+    def _arm_weight_paint(self, layout, context):
         scene = context.scene
         wm = context.window_manager
         gbh_rig = wm.gbh_rig
@@ -136,7 +150,7 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
             "WPAINT_HLT",
             title,
             gbh_rig,
-            "rig_weight_paint",
+            "arm_weight_paint",
             False
         )
         if sub_panel[0]:
@@ -213,7 +227,7 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
 
             box = body.box()
             col = box.column()
-            if gbh_rig.rig_use_mods:
+            if gbh_rig.arm_use_mods:
                 col.prop(
                     gbh_rig,
                     "wp_fix_braids_switch",

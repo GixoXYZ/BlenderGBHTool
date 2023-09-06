@@ -10,14 +10,18 @@ from . import common_functions as cf
 
 
 def _add_parent_bone(scene, context, armature_name, parent_size):
+    wm = context.window_manager
+    gbh_rig = wm.gbh_rig
     bone_obj = bpy.data.objects[armature_name]
     cf.set_active_object(context, bone_obj)
     # Add parent bone.
     bpy.ops.object.mode_set(mode="EDIT")
     # Get edit bones.
     edit_bones = bone_obj.data.edit_bones
+
+    parent_name = gbh_rig.arm_name_parent_bone or "Parent_Bone"
     # Add new bone.
-    new_bone = edit_bones.new("parent_bone")
+    new_bone = edit_bones.new(parent_name)
     new_bone.head = (0, 0, 0)
     new_bone.tail = (0, 0, parent_size)
 
@@ -27,9 +31,29 @@ def _add_parent_bone(scene, context, armature_name, parent_size):
             # Select bone by name.
             edit_bones.active = edit_bones[bone.name]
             # Set parent of selected bone.
-            edit_bones.active.parent = edit_bones["parent_bone"]
+            edit_bones.active.parent = edit_bones[parent_name]
 
     bpy.ops.object.mode_set(mode="OBJECT")
+
+
+def _rename_bones(scene, context, armature_name):
+    wm = context.window_manager
+    gbh_rig = wm.gbh_rig
+
+    bones = bpy.data.armatures[armature_name].bones
+    root_bones = []
+    for bone in bones:
+        if not bone.parent:
+            root_bones.append(bone)
+
+    chain_index = 1
+    for root_bone in root_bones:
+        bone_index = 1
+        root_bone.name = f"{gbh_rig.arm_name_chain}{chain_index}{gbh_rig.arm_name_separator}{gbh_rig.arm_name_bone}{bone_index}"
+        for bone in root_bone.children_recursive:
+            bone.name = f"{gbh_rig.arm_name_chain}{chain_index}{gbh_rig.arm_name_separator}{gbh_rig.arm_name_bone}{bone_index + 1}"
+            bone_index += 1
+        chain_index += 1
 
 
 def _apply_skin_modifier(context, new_object, armature_name):
@@ -181,6 +205,7 @@ class GBH_OT_hair_to_armature(Operator):
 
         try:
             _apply_skin_modifier(context, dummy_mesh, armature_name)
+            _rename_bones(scene, context, armature_name)
             if gbh_rig.arm_add_parent_bone:
                 parent_size = gbh_rig.arm_parent_size / 100
                 _add_parent_bone(scene, context, armature_name, parent_size)
@@ -375,8 +400,8 @@ class GBH_OT_select_similar_bones(Operator):
             for bone in armature_obj_data.bones:
                 bone.select = bool(bone.name.endswith(name_pattern))
         else:
-            bone_name = bpy.context.object.data.bones.active.name
-            name_pattern = bone_name.split("_")[-1]
+            bone_name = context.object.data.bones.active.name
+            name_pattern = bone_name.split(gbh_rig.arm_name_bone)[-1]
             bpy.ops.pose.select_all(action="DESELECT")
             bpy.ops.object.select_pattern(pattern=f"*{name_pattern}")
 
