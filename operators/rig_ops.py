@@ -258,7 +258,7 @@ class GBH_OT_automatic_weight_paint(Operator):
 
         dummy_obj = context.object
 
-        if gbh_rig.arm_use_mods and not gbh_rig.wp_fix_braids_switch:
+        if gbh_rig.arm_use_mods and not gbh_rig.wp_fix_duplicated_mesh_switch:
             _use_mods(context, org_hair_object, dummy_obj)
             cf.set_active_object(context, dummy_obj)
             bpy.ops.object.convert(target="MESH")
@@ -281,7 +281,7 @@ class GBH_OT_automatic_weight_paint(Operator):
             vector3_co = Vector((point_co.x, point_co.y, point_co.z))
             objs_roots.append(vector3_co)
 
-            if gbh_rig.arm_use_mods and gbh_rig.wp_fix_braids_switch:
+            if gbh_rig.arm_use_mods and gbh_rig.wp_fix_duplicated_mesh_switch:
                 _use_mods(context, org_hair_object, obj)
                 cf.set_active_object(context, obj)
 
@@ -388,7 +388,7 @@ class GBH_OT_select_similar_bones(Operator):
 
         if mode == "PAINT_WEIGHT":
             bone_name = context.object.parent.data.bones.active.name
-            name_pattern = bone_name.split("_")[-1]
+            name_pattern = bone_name.split(gbh_rig.arm_name_bone)[-1]
             armature_obj = context.object.parent
             armature_obj_data = armature_obj.data
 

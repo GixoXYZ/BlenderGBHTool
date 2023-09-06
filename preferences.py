@@ -113,7 +113,7 @@ class GBHPreferences(AddonPreferences):
     lib_add_to_active_object: BoolProperty(
         name="Add Node Groups to Active Object",
         description="Add node groups to active objects in viewport instead of adding them only to hair object",
-        default=True,
+        default=False,
     )
     icon_color: EnumProperty(
         items=[

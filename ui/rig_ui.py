@@ -230,7 +230,7 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
             if gbh_rig.arm_use_mods:
                 col.prop(
                     gbh_rig,
-                    "wp_fix_braids_switch",
+                    "wp_fix_duplicated_mesh_switch",
                 )
             col.operator("gbh.automatic_weight_paint")
 

@@ -321,8 +321,9 @@ class GBH_RigProperties(PropertyGroup):
         soft_max=100,
         min=0,
     )
-    wp_fix_braids_switch: BoolProperty(
-        name="Fix Braids Mesh",
+    wp_fix_duplicated_mesh_switch: BoolProperty(
+        name="Fix Duplicated Mesh",
+        default=True
     )
     wp_tweak_levels_switch: BoolProperty(
         name="Tweak Levels",
