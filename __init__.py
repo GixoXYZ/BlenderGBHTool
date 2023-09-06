@@ -9,7 +9,7 @@ bl_info = {
     "author": "Gixo <notgixo@proton.me>",
     "description": "Gixo's Blender Hair Tool generates different hair styles using Blender's new hair system.",
     "blender": (3, 5, 0),
-    "version": (2, 2, 0, "alpha", 2),
+    "version": (2, 2, 0, "alpha", 3),
     "location": "View3D > Toolshelf > GBH Tool",
     "warning": "",
     "support": "COMMUNITY",
