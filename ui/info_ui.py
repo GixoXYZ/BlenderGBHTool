@@ -201,6 +201,15 @@ class VIEW3D_PT_info_ui_main(Panel, GBHBasePanel):
                 text=text1,
                 parent=box
             )
+            col = body.column()
+            col.label(text="Bones have different numbers when weight painting is used?", icon="INFO")
+            box = body.box()
+            text1 = "- This happens because we have to make a new armature in a specific way when we use weight painting. As of now, we don't have a solution for this problem."
+            multi_line_text(
+                context=context,
+                text=text1,
+                parent=box
+            )
 
 
 classes = (
