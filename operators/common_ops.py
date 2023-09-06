@@ -40,7 +40,7 @@ class GBH_OT_open_folder(Operator):
         return {"FINISHED"}
 
     def _show_error(self, err):
-        print(err)
+        print(f"GBH Tool: {err}")
         err = "An error occurred, please try opening the directory manually."
         self.report({"ERROR"}, err)
 

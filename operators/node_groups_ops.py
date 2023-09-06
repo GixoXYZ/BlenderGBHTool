@@ -11,7 +11,7 @@ def _attr_or_vertex_group_name_enum_items(self, context):
     scene = context.scene
     obj = scene.hair_object
 
-    # Get available attributes
+    # Get available attributes.
     groups = [
         (group.name, f"Point > {group.name}", "") for group in obj.vertex_groups
     ]
@@ -184,7 +184,7 @@ class GBH_OT_apply_modifier(Operator):
             bpy.ops.object.modifier_apply(modifier=mod.name)
 
         except RuntimeError as err:
-            print(err)
+            print(f"GBH Tool: {err}")
             if scene.hair_object.type == "CURVE":
                 err = "Cannot apply constructive modifiers on curve. Convert curve in order to apply."
 
@@ -196,7 +196,7 @@ class GBH_OT_apply_modifier(Operator):
         return {"FINISHED"}
 
 
-# Delete all object's modifiers except then ones generated with GBH Tool
+# Delete all object's modifiers except then ones generated with GBH Tool.
 class GBH_OT_delete_all_mods(Operator):
     bl_idname = "gbh.delete_all_mods"
     bl_label = "Delete All Modifiers"

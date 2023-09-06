@@ -163,7 +163,7 @@ def append_node_groups(self, context, path, ng_name):
         bpy.ops.wm.append(filename=ng_name, directory=node_path)
 
     except (RuntimeError, OSError) as err:
-        print(err)
+        print(f"GBH Tool: {err}")
         err = IMPORT_FAIL
         self.report({"ERROR"}, err)
 
@@ -178,7 +178,7 @@ def append_materials(self, context, path, mat_name):
         bpy.ops.wm.append(filename=mat_name, directory=mat_path)
 
     except (RuntimeError, OSError) as err:
-        print(err)
+        print(f"GBH Tool: {err}")
         err = IMPORT_FAIL
         self.report({"ERROR"}, err)
 
@@ -196,7 +196,7 @@ def append_object(self, object_path, object_name):
             return obj
 
     except (RuntimeError, OSError) as err:
-        print(err)
+        print(f"GBH Tool: {err}")
         err = IMPORT_FAIL
         self.report({"ERROR"}, err)
 
@@ -250,7 +250,7 @@ def copy_modifiers(context, source_object, target_object, clear_existing_modifie
             active_object=source_object
         )
 
-        # Copy modifiers from source to target objects
+        # Copy modifiers from source to target objects.
         with context.temp_override(selected_objects=source_object):
             bpy.ops.object.make_links_data(type="MODIFIERS")
 
@@ -276,7 +276,7 @@ def set_ng_modifiers(obj, ng_name, **kwargs):
     float_props = kwargs.get("float_props")
     bool_props = kwargs.get("bool_props")
 
-    # Add geometry node modifier to generated hair mesh
+    # Add geometry node modifier to generated hair mesh.
 
     if not obj.modifiers.get(ng_name):
         obj.modifiers.new(name=ng_name, type="NODES")
@@ -284,7 +284,7 @@ def set_ng_modifiers(obj, ng_name, **kwargs):
     ng = bpy.data.node_groups[ng_name]
     obj.modifiers[ng_name].node_group = ng
 
-    # Set values for pointer props
+    # Set values for pointer props.
 
     if pointer_props:
         for pointer_prop in pointer_props:
@@ -295,7 +295,7 @@ def set_ng_modifiers(obj, ng_name, **kwargs):
                     pointer_prop[2]
                 )
 
-    # Set values for float props
+    # Set values for float props.
 
     if float_props:
         for float_prop in float_props:
@@ -305,7 +305,7 @@ def set_ng_modifiers(obj, ng_name, **kwargs):
                     float_prop[1]
                 )
 
-    # Set values for integer props
+    # Set values for integer props.
 
     if int_props:
         for int_prop in int_props:
@@ -315,7 +315,7 @@ def set_ng_modifiers(obj, ng_name, **kwargs):
                     int_prop[1]
                 )
 
-    # Set values for bool props
+    # Set values for bool props.
 
     if bool_props:
         for bool_prop in bool_props:
@@ -354,3 +354,10 @@ def create_new_item(context, scene, item_name, item_type):
         world = bpy.data.worlds.new(item_name)
         scene.world = world
         return world
+
+
+def redraw_area_ui(area_type):
+    for window in bpy.context.window_manager.windows:
+        for area in window.screen.areas:
+            if (area.type == area_type):
+                area.tag_redraw()

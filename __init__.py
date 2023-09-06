@@ -101,8 +101,6 @@ modules = [
 def register():
 
     gv.GBH_VERSION = list(bl_info["version"])
-    # TODO: Remove debugging prints.
-    print(gv.GBH_VERSION)
 
     for module in modules:
         module.register()

@@ -15,7 +15,7 @@ def add_hotkey():
     kc = wm.keyconfigs.addon
 
     if not kc:
-        print("Keymap Error")
+        print("GBH Tool: Keymap Error")
         return
 
     km_3d = kc.keymaps.new(name="3D View", space_type="VIEW_3D")

@@ -12,11 +12,11 @@ from . import common_functions as cf
 def _add_parent_bone(scene, context, armature_name, parent_size):
     bone_obj = bpy.data.objects[armature_name]
     cf.set_active_object(context, bone_obj)
-    # Adding parent bone
+    # Add parent bone.
     bpy.ops.object.mode_set(mode="EDIT")
-    # Get edit bones
+    # Get edit bones.
     edit_bones = bone_obj.data.edit_bones
-    # Add new bone
+    # Add new bone.
     new_bone = edit_bones.new("parent_bone")
     new_bone.head = (0, 0, 0)
     new_bone.tail = (0, 0, parent_size)
@@ -24,19 +24,22 @@ def _add_parent_bone(scene, context, armature_name, parent_size):
     bones = bpy.data.armatures[armature_name].bones
     for bone in bones:
         if not bone.parent:
-            # Select bone by name
+            # Select bone by name.
             edit_bones.active = edit_bones[bone.name]
-            # Set parent of selected bone
+            # Set parent of selected bone.
             edit_bones.active.parent = edit_bones["parent_bone"]
 
     bpy.ops.object.mode_set(mode="OBJECT")
 
 
 def _apply_skin_modifier(context, new_object, armature_name):
+    wm = context.window_manager
+    gbh_rig = wm.gbh_rig
+
     cf.set_active_object(context, new_object)
-    # Add skin modifier
+    # Add skin modifier.
     bpy.ops.object.modifier_add(type="SKIN")
-    # Set root vertex for converted mesh
+    # Set root vertex for converted mesh.
     bpy.ops.object.mode_set(mode="EDIT")
     bpy.ops.mesh.select_all(action="SELECT")
     bpy.ops.object.skin_root_mark()
@@ -46,10 +49,10 @@ def _apply_skin_modifier(context, new_object, armature_name):
         bpy.data.armatures.remove(existing_armature, do_unlink=True)
     bpy.ops.object.skin_armature_create(modifier="")
 
-    # Change armature name and display mode
+    # Change armature name and display mode.
     context.object.name = armature_name
     context.object.data.name = armature_name
-    context.object.data.display_type = "OCTAHEDRAL"
+    context.object.data.display_type = gbh_rig.arm_display_type
 
 
 def _clean_up(dummy_mesh, convert_ng, hair_duple):
@@ -98,7 +101,7 @@ def _use_mods(context, hair_object, hair_duple):
                     unused_modifiers.append(mod.node_group.name)
                     hair_duple.modifiers.remove(mod)
 
-    gbh_rig.rig_not_used_mods = str(unused_modifiers)
+    gbh_rig.arm_not_used_mods = str(unused_modifiers)
 
 
 """
@@ -128,7 +131,7 @@ class GBH_OT_hair_to_armature(Operator):
         location = hair_object.matrix_world.translation
         rotation = hair_object.rotation_euler
 
-        # If rig maker node group doesn't already exist in file
+        # Check if rig maker node group doesn't already exist in file.
         if not convert_node_group:
             path = os.path.join(DIR_ASSETS, PRE_MADE_NODES_FILE)
             cf.append_node_groups(self, context, path, convert_ng)
@@ -148,21 +151,21 @@ class GBH_OT_hair_to_armature(Operator):
         cf.set_object_location(hair_duple, location)
         cf.set_object_rotation(hair_duple, rotation)
 
-        if gbh_rig.rig_use_mods:
+        if gbh_rig.arm_use_mods:
             _use_mods(context, hair_object, hair_duple)
 
         object_pointer = [[scene, "object_pointer", hair_duple]]
 
         float_props = [
-            [gbh_rig, "rig_density"],
-            [gbh_rig, "rig_start"],
-            [gbh_rig, "rig_end"],
+            [gbh_rig, "arm_density"],
+            [gbh_rig, "arm_start"],
+            [gbh_rig, "arm_end"],
         ]
         int_props = [
-            [gbh_rig, "rig_res"],
+            [gbh_rig, "arm_res"],
         ]
         bool_props = [
-            [gbh_rig, "rig_reverse"],
+            [gbh_rig, "arm_reverse"],
         ]
 
         cf.set_ng_modifiers(
@@ -178,8 +181,8 @@ class GBH_OT_hair_to_armature(Operator):
 
         try:
             _apply_skin_modifier(context, dummy_mesh, armature_name)
-            if gbh_rig.rig_add_parent_bone:
-                parent_size = gbh_rig.rig_parent_size / 100
+            if gbh_rig.arm_add_parent_bone:
+                parent_size = gbh_rig.arm_parent_size / 100
                 _add_parent_bone(scene, context, armature_name, parent_size)
 
             _clean_up(dummy_mesh, convert_ng, hair_duple)
@@ -207,18 +210,18 @@ class GBH_OT_automatic_weight_paint(Operator):
         if context.active_object:
             bpy.ops.object.mode_set(mode="OBJECT")
 
-        bpy.context.scene["hair_object"].hide_set(False)
+        context.scene["hair_object"].hide_set(False)
 
         org_hair_object = scene.hair_object
-        org_parent_bone = gbh_rig.rig_add_parent_bone
-        gbh_rig.rig_add_parent_bone = False
+        org_parent_bone = gbh_rig.arm_add_parent_bone
+        gbh_rig.arm_add_parent_bone = False
 
         try:
             bpy.ops.gbh.convert_hair(convert_to="MESH")
-            test_mesh = bpy.context.object
+            test_mesh = context.object
             cf.delete_item(test_mesh.data)
 
-        except RuntimeError as e:
+        except RuntimeError:
             err = "Geometry from hair source does not contain a mesh."
             self.report({"ERROR"}, err)
 
@@ -226,16 +229,16 @@ class GBH_OT_automatic_weight_paint(Operator):
 
         cf.set_active_object(context, scene.hair_object)
         bpy.ops.object.duplicate(linked=False)
-        dummy_hair_obj = scene.hair_object = bpy.context.object
+        dummy_hair_obj = scene.hair_object = context.object
 
         bpy.ops.gbh.delete_all_mods()
 
         bpy.ops.gbh.convert_hair(convert_to="CURVE")
         cf.delete_item(dummy_hair_obj.data)
 
-        dummy_obj = bpy.context.object
+        dummy_obj = context.object
 
-        if gbh_rig.rig_use_mods and not gbh_rig.wp_fix_braids_switch:
+        if gbh_rig.arm_use_mods and not gbh_rig.wp_fix_braids_switch:
             _use_mods(context, org_hair_object, dummy_obj)
             cf.set_active_object(context, dummy_obj)
             bpy.ops.object.convert(target="MESH")
@@ -244,7 +247,7 @@ class GBH_OT_automatic_weight_paint(Operator):
         objs = []
         for _ in dummy_obj.data.splines:
             bpy.ops.object.duplicate(linked=False)
-            objs.append(bpy.context.object)
+            objs.append(context.object)
 
         objs_roots = []
         for obj_index, obj in enumerate(objs):
@@ -258,11 +261,9 @@ class GBH_OT_automatic_weight_paint(Operator):
             vector3_co = Vector((point_co.x, point_co.y, point_co.z))
             objs_roots.append(vector3_co)
 
-            if gbh_rig.rig_use_mods and gbh_rig.wp_fix_braids_switch:
+            if gbh_rig.arm_use_mods and gbh_rig.wp_fix_braids_switch:
                 _use_mods(context, org_hair_object, obj)
                 cf.set_active_object(context, obj)
-                # bpy.ops.object.convert(target="MESH")
-                # bpy.ops.object.convert(target="CURVE")
 
             bpy.ops.gbh.hair_to_armature()
 
@@ -274,29 +275,29 @@ class GBH_OT_automatic_weight_paint(Operator):
             cf.copy_modifiers(context, org_hair_object, obj, False)
             scene.hair_object = obj
             bpy.ops.gbh.convert_hair(convert_to="MESH")
-            mesh_objs.append(bpy.context.object)
+            mesh_objs.append(context.object)
             cf.delete_item(obj.data)
 
         for mesh_index, mesh in enumerate(mesh_objs):
             name = mesh.name.replace("Mesh", "Armature")
             active_object = bpy.data.objects[name]
             for bone_index, bone in enumerate(active_object.data.bones):
-                bone.name = f"Hair{mesh_index + 1}_Bone{bone_index}"
+                bone.name = f"{gbh_rig.arm_name_chain}{mesh_index + 1}{gbh_rig.arm_name_separator}{gbh_rig.arm_name_bone}{bone_index + 1}"
             arm_objs.append(active_object)
             cf.select_objects(context, mesh, active_object)
 
             bpy.ops.object.parent_set(type="ARMATURE_AUTO")
 
             if gbh_rig.wp_clear_from_roots_switch:
-                # Set the active object
+                # Set the active object.
                 cf.set_active_object(context, mesh)
-                # Make sure the object is in Weight Paint mode
+                # Make sure the object is in Weight Paint mode.
                 bpy.ops.object.mode_set(mode="WEIGHT_PAINT")
                 for vertex in mesh.data.vertices:
                     root_co = objs_roots[mesh_index]
                     distance = (vertex.co - root_co).length
                     if distance <= (gbh_rig.wp_clear_from_roots_distance / 100):
-                        # Iterate through the vertices and clear weight paint
+                        # Iterate through the vertices and clear weight paint.
                         for group in mesh.vertex_groups:
                             group.remove([vertex.index])
 
@@ -315,14 +316,14 @@ class GBH_OT_automatic_weight_paint(Operator):
                     gain=gbh_rig.wp_level_gain
                 )
 
-            # Update the view to reflect changes
-            bpy.context.view_layer.update()
+            # Update the view to reflect changes.
+            context.view_layer.update()
 
-            # Exit weight paint mode
+            # Exit weight paint mode.
             bpy.ops.object.mode_set(mode="OBJECT")
 
         scene.hair_object = org_hair_object
-        gbh_rig.rig_add_parent_bone = org_parent_bone
+        gbh_rig.arm_add_parent_bone = org_parent_bone
 
         armature_name = f"{org_hair_object.name}_Armature"
         mesh_name = f"{org_hair_object.name}_Mesh_WeightPainted"
@@ -335,19 +336,19 @@ class GBH_OT_automatic_weight_paint(Operator):
         cf.select_objects(context, arm_objs, arm_objs[0])
         bpy.ops.object.join()
 
-        bpy.context.object.name = armature_name
-        bpy.context.object.data.name = armature_name
+        context.object.name = armature_name
+        context.object.data.name = armature_name
 
         cf.select_objects(context, mesh_objs, mesh_objs[0])
         bpy.ops.object.join()
-        bpy.context.object.name = mesh_name
-        bpy.context.object.data.name = mesh_name
+        context.object.name = mesh_name
+        context.object.data.name = mesh_name
 
-        if gbh_rig.rig_add_parent_bone:
-            parent_size = gbh_rig.rig_parent_size / 100
+        if gbh_rig.arm_add_parent_bone:
+            parent_size = gbh_rig.arm_parent_size / 100
             _add_parent_bone(scene, context, armature_name, parent_size)
 
-        bpy.context.scene["hair_object"].hide_set(True)
+        context.scene["hair_object"].hide_set(True)
 
         return {"FINISHED"}
 
@@ -358,17 +359,17 @@ class GBH_OT_select_similar_bones(Operator):
     bl_description = "Automatically select similar bones"
     bl_options = {"REGISTER", "UNDO"}
 
-    # TODO Add select by in-chain location.
+    # TODO: Add select by in-chain location.
     def execute(self, context):
         wm = context.window_manager
         gbh_rig = wm.gbh_rig
 
-        mode = bpy.context.mode
+        mode = context.mode
 
         if mode == "PAINT_WEIGHT":
-            bone_name = bpy.context.object.parent.data.bones.active.name
+            bone_name = context.object.parent.data.bones.active.name
             name_pattern = bone_name.split("_")[-1]
-            armature_obj = bpy.context.object.parent
+            armature_obj = context.object.parent
             armature_obj_data = armature_obj.data
 
             for bone in armature_obj_data.bones:
@@ -388,12 +389,11 @@ class GBH_OT_select_all_bones(Operator):
     bl_description = "Automatically all bones"
     bl_options = {"REGISTER", "UNDO"}
 
-    # TODO Fix select all method.
     def execute(self, context):
-        mode = bpy.context.mode
+        mode = context.mode
 
         if mode == "PAINT_WEIGHT":
-            armature_obj = bpy.context.object.parent
+            armature_obj = context.object.parent
             armature_obj_data = armature_obj.data
 
             for bone in armature_obj_data.bones:

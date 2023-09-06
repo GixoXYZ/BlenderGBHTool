@@ -68,12 +68,12 @@ def _connect_compositor_nodes(context, render_layers_node, file_output_node):
     wm = context.window_manager
     gbh_hair_card = wm.gbh_hair_card
     pref = context.preferences.addons[gv.GBH_PACKAGE].preferences
-    # Set output name
+    # Set output name.
     output_name = gbh_hair_card.hc_output_name
     if output_name == "":
         output_name = "Texture"
 
-    # Remove all existing nodes
+    # Remove all existing nodes from compositor.
     for i in file_output_node.inputs:
         file_output_node.inputs.remove(i)
 
@@ -84,7 +84,7 @@ def _connect_compositor_nodes(context, render_layers_node, file_output_node):
             i += 1
             digits = f"{digits}#"
 
-    # Get enabled render passes, create and connect sockets on file output node
+    # Get enabled render passes, create and connect sockets on file output node.
     rl_node_outputs = render_layers_node.outputs
     for output in rl_node_outputs:
         if output.enabled:
@@ -109,7 +109,7 @@ def rename_renders(self):
             None
         )
         directory_path = node.base_path
-        # Rename and replace files
+        # Rename and replace existing files.
         existing_files = []
         existing_files.clear()
         existing_files = list(os.listdir(directory_path))
@@ -139,7 +139,7 @@ def _move_frame_named_renders(self, context):
         None
     )
     directory_path = node.base_path
-    # Rename and replace files
+    # Rename and replace existing files.
     existing_files = []
     existing_files.clear()
     existing_files = list(os.listdir(directory_path))
@@ -157,11 +157,11 @@ def _move_frame_named_renders(self, context):
             if not os.path.exists(destination):
                 os.makedirs(destination)
 
-            # Move render if already doesn't exists
+            # Move render if already doesn't exists.
             if not os.path.isfile(file_destination):
                 shutil.move(file, file_destination)
 
-            # Rename then move render if already exists
+            # Rename then move render if already exists.
             else:
                 name, ext = os.path.splitext(existing_name)
                 i = 1
@@ -197,29 +197,29 @@ class GBH_OT_create_hc_scene(Operator):
         wm = context.window_manager
         gbh_hair_card = wm.gbh_hair_card
 
-        # Create hair card texturing scene
+        # Create hair card texturing scene.
         item_name = f"{HC_TEXTURING_NAME} Texturing"
         item_type = "SCENE"
         scene = cf.create_new_item(context, scene, item_name, item_type)
 
-        # Create new world
+        # Create new world.
         item_name = f"{HC_TEXTURING_NAME} World"
         item_type = "WORLD"
         cf.create_new_item(context, scene, item_name, item_type)
 
-        # Set render resolution for hair card texturing scene
+        # Set render resolution for hair card texturing scene.
         resolution_x = int(gbh_hair_card.hc_resolution)
         resolution_y = int(gbh_hair_card.hc_resolution)
         _set_render_resolution(scene, resolution_x, resolution_y)
 
-        # Create new sun light
+        # Create new sun light.
         item_name = f"{HC_TEXTURING_NAME} Sun Light"
         item_type = "SUN_LIGHT"
         sun_light = cf.create_new_item(context, scene, item_name, item_type)
         location = (0, 0, 10)
         cf.set_object_location(sun_light, location)
 
-        # Create new camera
+        # Create new camera.
         item_name = f"{HC_TEXTURING_NAME} Camera"
         item_type = "CAMERA"
         camera = cf.create_new_item(context, scene, item_name, item_type)
@@ -231,12 +231,12 @@ class GBH_OT_create_hc_scene(Operator):
         rotation = x, y, z
         cf.set_object_rotation(camera, rotation)
 
-        # Set scene camera and background transparency then change to camera view
+        # Set scene camera and background transparency then change to camera view.
         scene.camera = camera
         context.scene.render.film_transparent = True
         bpy.ops.view3d.view_camera()
 
-        # Set recommended render passes
+        # Set recommended render passes.
         passes = [
             "use_pass_diffuse_color",
             "use_pass_glossy_color",
@@ -245,7 +245,7 @@ class GBH_OT_create_hc_scene(Operator):
         view_layer = context.view_layer
         _set_render_passes(view_layer, passes)
 
-        # Set up compositor nodes
+        # Set up compositor nodes.
         rl_node, fo_node = _create_compositor_nodes(context)
         _connect_compositor_nodes(context, rl_node, fo_node)
 
@@ -296,7 +296,7 @@ class GBH_OT_add_hc_object(Operator):
         hc_object_name = gbh_hair_card.hc_object_name
 
         item_name = hc_object_name if hc_object_name != "" else "Hair Object"
-        # Create new empty curve
+        # Create new empty curve.
         item_type = "CURVE"
         cf.create_new_item(context, scene, item_name, item_type)
 
@@ -362,7 +362,7 @@ class GBH_OT_set_passes(Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        # Set up compositor nodes
+        # Set up compositor nodes.
         rl_node, fo_node = _create_compositor_nodes(context)
         _connect_compositor_nodes(context, rl_node, fo_node)
 
@@ -390,7 +390,7 @@ class GBH_OT_render(Operator):
             return {"CANCELLED"}
 
         if pref.hc_auto_add_pass:
-            # Set up compositor nodes
+            # Set up compositor nodes.
             rl_node, fo_node = _create_compositor_nodes(context)
             _connect_compositor_nodes(context, rl_node, fo_node)
 

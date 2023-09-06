@@ -58,21 +58,7 @@ def _lib_search_update(self, context):
 """Rig update functions"""
 
 
-def _rig_int_update(self, context):
-    wm = context.window_manager
-    gbh_rig = wm.gbh_rig
-    if gbh_rig.rig_live_preview:
-        bpy.ops.gbh.hair_to_armature()
-
-
-def _rig_float_update(self, context):
-    wm = context.window_manager
-    gbh_rig = wm.gbh_rig
-    if gbh_rig.rig_live_preview:
-        bpy.ops.gbh.hair_to_armature()
-
-
-def _rig_bool_update(self, context):
+def _arm_update(self, context):
     wm = context.window_manager
     gbh_rig = wm.gbh_rig
     if gbh_rig.rig_live_preview:
@@ -86,14 +72,14 @@ def _render_complete_handler(self, context):
     if self.hc_add_current_frame_to_names:
         try:
             bpy.app.handlers.render_complete.remove(rename_renders)
-            print("Render rename handler removed")
+            print("GBH Tool: Render rename handler removed.")
 
         except ValueError as err:
-            print(err)
+            print(f"GBH Tool: {err}")
 
     else:
         bpy.app.handlers.render_complete.append(rename_renders)
-        print("Render rename handler added")
+        print("GBH Tool: Render rename handler added.")
 
 
 """Mods functions"""
@@ -230,64 +216,64 @@ class GBH_RigProperties(PropertyGroup):
         description="Show live preview of bones",
         default=True,
     )
-    rig_res: IntProperty(
+    arm_res: IntProperty(
         name="Rig Resolution",
         description="Number of bones in each chain",
         min=2,
         soft_max=10,
         default=5,
-        update=_rig_int_update,
+        update=_arm_update,
     )
-    rig_density: FloatProperty(
+    arm_density: FloatProperty(
         name="Rig Density",
         description="Density of bones chains per hair curves",
         min=0,
         max=100,
         default=100,
-        update=_rig_float_update,
+        update=_arm_update,
     )
-    rig_start: FloatProperty(
+    arm_start: FloatProperty(
         name="Rig Start",
         description="Start of bone chains in relation to hair curves",
         min=0,
         max=100,
         default=0,
-        update=_rig_float_update,
+        update=_arm_update,
     )
-    rig_end: FloatProperty(
+    arm_end: FloatProperty(
         name="Rig End",
         description="End of bone chains in relation to hair curves",
         min=0,
         max=100,
         default=100,
-        update=_rig_float_update,
+        update=_arm_update,
     )
-    rig_parent_size: FloatProperty(
+    arm_parent_size: FloatProperty(
         name="Armature Parent Bone Size (cm)",
         description="Size of added parent bone to the armature",
         min=5,
         max=100,
         default=25,
-        update=_rig_float_update,
+        update=_arm_update,
     )
-    rig_reverse: BoolProperty(
+    arm_reverse: BoolProperty(
         name="Reverse Chains Direction",
         description="Reverse bone chains direction",
-        update=_rig_bool_update,
+        update=_arm_update,
     )
-    rig_add_parent_bone: BoolProperty(
+    arm_add_parent_bone: BoolProperty(
         name="Add Parent Bone",
         description="Add parent bone to armature",
         default=True,
-        update=_rig_bool_update,
+        update=_arm_update,
     )
-    rig_use_mods: BoolProperty(
+    arm_use_mods: BoolProperty(
         name="Use Object's Modifiers",
         description="Use object's modifiers to create armature from",
         default=False,
-        update=_rig_bool_update,
+        update=_arm_update,
     )
-    rig_not_used_mods: StringProperty()
+    arm_not_used_mods: StringProperty()
 
     rig_weight_paint: BoolProperty(
         name="Minimize/Maximize Weight Paint",

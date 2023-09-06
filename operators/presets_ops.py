@@ -18,7 +18,7 @@ def _get_path(context):
     if context.active_object:
         bpy.ops.object.mode_set(mode="OBJECT")
 
-    # Get presets path
+    # Get presets path.
     path = os.path.join(DIR_PRESETS, f"{gbh_presets.presets_hair_type}/")
     return path
 
@@ -69,7 +69,7 @@ def refresh_presets_list(self, context):
             preset.name = blend_file
 
     except FileNotFoundError as err:
-        print(err)
+        print(f"GBH Tool: {err}")
         err = f"Error: presets/{gbh_presets.presets_hair_type} directory has been moved or removed. Recreate directory or reinstall add-on."
         self.report({"ERROR"}, err)
 
@@ -92,7 +92,7 @@ class GBH_OT_save_preset(Operator):
         gbh_presets = wm.gbh_presets
         object_name = gbh_presets.new_preset_name
         source_object = scene.hair_object
-        # Save preset if it doesn't already exists, the name is not blank and the list items count is under 100
+        # Save preset if it doesn't already exists, the name is not blank and the list items count is under 100.
         if object_name and object_name not in blend_files and len(blend_files) < 100:
             presets_type = gbh_presets.presets_hair_type
             dif_name_than_hair = source_object.name != object_name
@@ -159,7 +159,7 @@ class GBH_OT_remove_preset(Operator):
             refresh_presets_list(self, context)
             gbh_presets = wm.gbh_presets
 
-            # Change presets list index when removing and object to avoid index out of range error
+            # Change presets list index when removing and object to avoid index out of range error.
             if gbh_presets.presets_list_index > 0:
                 gbh_presets.presets_list_index -= 1
 
@@ -167,7 +167,7 @@ class GBH_OT_remove_preset(Operator):
                 gbh_presets.presets_list_index -= 0
 
         except OSError as err:
-            print(err)
+            print(f"GBH Tool: {err}")
             err = "Preset is no longer available, refresh presets to update the list."
             self.report({"ERROR"}, err)
 
@@ -186,7 +186,7 @@ class GBH_OT_load_preset(Operator):
         gbh_presets = wm.gbh_presets
         presets_list = wm.get("gbh_presets_list")
 
-        # If presets list is not empty
+        # Check if presets list is not empty.
         file_name = _get_preset_file_name()
         file_loc = _get_preset_file_loc(context, file_name)
         object_path = file_loc

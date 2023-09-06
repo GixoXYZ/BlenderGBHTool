@@ -81,7 +81,7 @@ def _load_blend_file(path):
     files = [
         files for files in os.listdir(path) if os.path.isfile(os.path.join(path, files))
     ]
-    # List .blend files
+    # List .blend files.
     _blends_collection.extend(
         [file for file in files if file.endswith(".blend")]
     )
@@ -92,7 +92,7 @@ def _load_materials(path):
     for blend in _blends_collection:
         blend_file = os.path.join(path, blend)
         with bpy.data.libraries.load(blend_file, link=False) as (data_from, data_to):
-            # List materials
+            # List materials.
             _materials_collection.extend(
                 [(mat, blend) for mat in filter(None, data_from.materials)]
             )
@@ -105,7 +105,7 @@ def _load_node_groups(path):
     for blend in _blends_collection:
         blend_file = os.path.join(path, blend)
         with bpy.data.libraries.load(blend_file, link=False) as (data_from, data_to):
-            # List node groups
+            # List node groups.
             _node_groups_collection.extend(
                 [(ng, blend) for ng in filter(None, data_from.node_groups)]
             )
@@ -115,7 +115,7 @@ def _load_node_groups(path):
 
 
 def _add_nodes_to_object(self, context, ng_name):
-    # If the node tree shown in the library is not of geometry nodes type
+    # Check if the node tree shown in the library is not of geometry nodes type.
     if bpy.data.node_groups[ng_name].type != "GEOMETRY":
         err = "Selected node group is not of type geometry nodes and can't be added to objects."
         self.report({"ERROR"}, err)
@@ -130,13 +130,13 @@ def _add_nodes_to_object(self, context, ng_name):
             valid_types = ["CURVES", "CURVE", "MESH"]
             if obj.type in valid_types:
                 if not obj.modifiers.get(ng_name):
-                    # Add geometry node modifier then set modifier's node group
+                    # Add geometry node modifier then set modifier's node group.
                     obj.modifiers.new(name=ng_name, type="NODES")
-                # Set modifier's node group
+                # Set modifier's node group.
                 obj.modifiers[ng_name].node_group = bpy.data.node_groups[ng_name]
 
             if obj.type not in valid_types:
-                # If the selected object's type is not mesh or curve or hair curves
+                # Check if the selected object's type is not mesh or curve or hair curves.
                 invalid_type = True
 
     else:
@@ -152,7 +152,7 @@ def lib_search():
     wm = bpy.context.window_manager
     gbh_lib = wm.gbh_lib
 
-    # Set search domain category
+    # Set search domain category.
     if gbh_lib.asset_category == "MATERIALS":
         original_list = _materials_collection
         filtered_list = _filtered_materials_collection
@@ -212,16 +212,16 @@ class GBH_OT_node_group_append(Operator):
     )
 
     def execute(self, context):
-        # Separate node name and file name
+        # Separate node name and file name.
         ng_name = eval(self.nodename)[0]
         blend_name = eval(self.nodename)[1]
 
-        # Blend file path
+        # Blend file path.
         wm = bpy.context.window_manager
         gbh_lib = wm.gbh_lib
         blend_path = os.path.join(gbh_lib.lib_path, blend_name)
 
-        # Import selected node group
+        # Import selected node group.
         cf.append_node_groups(self, context, blend_path, ng_name)
         return {"FINISHED"}
 
@@ -252,7 +252,8 @@ class GBH_OT_node_group_add_to_object(Operator):
             _add_nodes_to_object(self, context, ng_name)
 
         else:
-            # If there's no valid object selected (usually occurs after deleting and object and not selecting a new one)
+            # Check if there's no valid object selected (usually occurs after deleting and
+            # object and not selecting a new one).
             err = (
                 "No valid active object found. Please select a valid object and try again."
                 if pref.lib_add_to_active_object
@@ -298,16 +299,16 @@ class GBH_OT_material_append(Operator):
     )
 
     def execute(self, context):
-        # Separate material name and file name
+        # Separate material name and file name.
         mat_name = eval(self.matname)[0]
         blend_name = eval(self.matname)[1]
 
-        # Blend file path
+        # Blend file path.
         wm = bpy.context.window_manager
         gbh_lib = wm.gbh_lib
         blend_path = os.path.join(gbh_lib.lib_path, blend_name)
 
-        # Import selected material
+        # Import selected material.
         cf.append_materials(self, context, blend_path, mat_name)
         return {"FINISHED"}
 
@@ -331,9 +332,9 @@ class GBH_OT_material_delete(Operator):
 
         images = bpy.data.images
         orphan_images_list = [img for img in images if not img.users]
-        # Delete material
+        # Delete material.
         cf.delete_item(materials[mat_name])
-        # Delete newly orphaned images
+        # Delete newly orphaned images.
         for img in images:
             if not img.users and img not in orphan_images_list:
                 images.remove(img)
@@ -349,7 +350,7 @@ class GBH_OT_open_user_lib(Operator):
     def execute(self, context):
         wm = bpy.context.window_manager
         gbh_lib = wm.gbh_lib
-        # Change category to user when setting user's library directory
+        # Change category to user when setting user's library directory.
         gbh_lib.lib_category = "USER"
 
         err, report = load_library(self, context)
@@ -371,14 +372,14 @@ class GBH_OT_close_user_lib(Operator):
     def execute(self, context):
         pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
 
-        # Clear listed items
+        # Clear listed items.
         _blends_collection.clear()
         _materials_collection.clear()
         _node_groups_collection.clear()
         _filtered_materials_collection.clear()
         _filtered_node_groups_collection.clear()
 
-        # Unset loaded directory
+        # Unset loaded directory.
         pref.property_unset("lib_user_folder")
         return {"FINISHED"}
 
@@ -403,12 +404,12 @@ class GBH_OT_open_user_file(Operator):
             if os.path.isfile(file_path):
                 subprocess.Popen(["blender", file_path])
 
-        # If no default blender installation is set in the OS
+        # Check if no default blender installation is set in the OS.
         except (RuntimeError, OSError) as err:
             err = "Couldn't find a Blender installation, try opening your file from your OS."
             self.report({"ERROR"}, err)
 
-        # If file was removed after loading user directory
+        # Check if file was removed after loading user directory.
         if not os.path.isfile(file_path):
             err = "File has been moved or removed."
             self.report({"ERROR"}, err)
@@ -430,7 +431,7 @@ class GBH_OT_change_lib_page(Operator):
         wm = bpy.context.window_manager
         gbh_lib = wm.gbh_lib
 
-        # Set library page index
+        # Set library page index.
         gbh_lib.lib_page_index = self.page_index
         return {"FINISHED"}
 

@@ -9,7 +9,7 @@ import threading
 from bpy.types import Operator
 
 from .. import global_variables as gv
-from ..utils.redraw_ui import redraw_area_ui
+from . import common_functions as cf
 
 UPDATE_TIMEOUT = 20
 DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -28,10 +28,9 @@ def check_for_updates():
 
     gv.update_checking = True
     if release_info := get_latest_release_info():
-        if update := compare_versions(release_info["tag"], gv.GBH_VERSION):
+        if compare_versions(release_info["tag"], gv.GBH_VERSION):
             gv.update_url = release_info["url"]
             gv.update_info_url = release_info["info_url"]
-            print(update)
             pref.update_available = True
             gbh_update.update_report = UPDATE_NEW
             pref.update_latest_version = release_info["tag"]
@@ -43,15 +42,14 @@ def check_for_updates():
         pref.last_update_check = datetime.datetime.now().strftime(DATE_TIME_FORMAT)
 
     gv.update_checking = False
-    redraw_area_ui("PREFERENCES")
-    redraw_area_ui("VIEW_3D")
+    cf.redraw_area_ui("PREFERENCES")
+    cf.redraw_area_ui("VIEW_3D")
 
 
 def compare_versions(latest_tag, gbh_version):
-    # Convert latest tag to a list
+    # Convert latest tag to a list.
     online_version = re.findall(r"\d+|[A-Za-z]+", latest_tag)[1:]
     parsed_online_version = [int(match) if match.isdigit() else match for match in online_version]
-    print(parsed_online_version, gbh_version)
     return parsed_online_version > gbh_version
 
 
@@ -69,7 +67,7 @@ def get_latest_release_info():
                     latest_release = releases[0]
                 else:
                     latest_release = releases
-                print("Latest Release Tag:", latest_release["tag_name"])
+                print(f"GBH Tool: Latest downloadable version is {latest_release['tag_name']}.")
                 assets = latest_release["assets"]
                 download_url = assets[0]["browser_download_url"]
                 release_tag = latest_release["tag_name"]
@@ -80,7 +78,7 @@ def get_latest_release_info():
             return None
 
     except (requests.exceptions.ConnectionError, requests.exceptions.RequestException) as err:
-        print(err)
+        print(f"GBH Tool: {err}")
         gbh_update.update_report = UPDATE_INTERNET_FAIL
         return None
 
@@ -106,7 +104,7 @@ class GBH_OT_update_check(Operator):
 
     def execute(self, context):
         gv.update_checking = True
-        # Run update checker on a new thread
+        # Run update checker on a new thread.
         threading.Thread(target=check_for_updates).start()
         return {"FINISHED"}
 
@@ -128,7 +126,7 @@ def register():
     has_time_elapsed = _has_time_elapsed()
 
     if pref.automatic_update_check and has_time_elapsed:
-        # Run update checker on a new thread
+        # Run update checker on a new thread.
         threading.Thread(target=check_for_updates).start()
 
 

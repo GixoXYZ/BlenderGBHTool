@@ -14,12 +14,12 @@ def get_icons():
 
 
 def load_icons():
-    # Remove the current icons and clear preview_collections
+    # Remove the current icons and clear preview_collections.
     for pcoll in _preview_collections.values():
         previews.remove(pcoll)
 
     _preview_collections.clear()
-    # Load new icons
+    # Load new icons.
     pcoll = previews.new()
     pref = bpy.context.preferences.addons[GBH_PACKAGE].preferences
     color = pref.icon_color

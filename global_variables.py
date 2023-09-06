@@ -3,11 +3,11 @@
 import bpy
 import os
 
-# Add-on info
+# Add-on info.
 GBH_PACKAGE = __package__
 GBH_VERSION = None
 
-# URLs
+# URLs.
 URL_DOCS = "https://notgixo.github.io/GBHToolDocs/"
 URL_CONTACT = "https://notgixo.github.io"
 URL_GITHUB = "https://github.com/notgixo/BlenderGBHTool"
@@ -20,7 +20,7 @@ URL_TWITTER = "https://twitter.com/notGixo"
 URL_DISCORD = "https://discord.com/invite/TxTpJ8FQaz"
 
 
-# Directories
+# Directories.
 current_file_path = os.path.dirname(__file__)
 blender_path = bpy.utils.resource_path("LOCAL")
 DIR_LIBRARY = os.path.join(current_file_path, "gbh_library/")
@@ -33,16 +33,16 @@ DIR_BLENDER_ASSETS = os.path.join(
     "datafiles/assets/geometry_nodes/"
 )
 
-# Files
+# Files.
 PRE_MADE_NODES_FILE = "pre_made_ng.blend"
 
-# UI
+# UI.
 LIST_ROWS = 4
 
-# Directory and file
+# Directory and file.
 INVALID_PATH = "Selected path is not valid."
 
-# Updating
+# Updating.
 update_checking = False
 update_url = "https://github.com/notgixo/BlenderGBHTool/releases"
 update_info_url = "https://github.com/notgixo/BlenderGBHTool/releases/latest"
