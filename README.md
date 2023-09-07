@@ -18,10 +18,18 @@ GBH Tool is a procedural hair add-on for Blender.
 - Hair conversion to mesh, curve, curves, or particle system for further operations
 - Pre-made node groups and sample materials library
 - Ability to load node groups and materials from your files into library
-- Hair rigging
+- Hair rigging and automatic weight paiting
 - Hair card texture creation
 
 Check out [GBH Tool Manual](https://notgixo.github.io/GBHToolDocs/) for more details.
+
+---
+
+IMPORTANT:
+
+Presets might not work on Blender 4.0 and later due to changes in Blender mesh data structure as the presets are saved as mesh data in .blend files.
+
+Until the stable release of Blender 4.0 the compatibility of the presets is not guaranteed. So don't rely highly on presets for now.
 
 ---
 
@@ -39,9 +47,9 @@ In Blender: Edit -> Preferences -> Add-ons -> Install -> Select downloaded zip a
 
 ## Roadmap:
 
-- More node groups and materials for GBH library
-- More animation related features
-- Automatic weight painting
+- Automatic weight painting (is now available on v2.2.0 alpha
+- Hair simulation and animation related features
+- Improvements for hair cards creation
 
 Done:
 
@@ -49,6 +57,7 @@ Done:
 - ~~Integration of new features of Blender 3.5~~
 - ~~More advanced library~~
 - ~~Hair cards texture creation feature~~
+- ~~More node groups and materials for GBH library~~
 
 ---
 
