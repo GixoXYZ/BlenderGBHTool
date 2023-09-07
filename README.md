@@ -47,7 +47,7 @@ In Blender: Edit -> Preferences -> Add-ons -> Install -> Select downloaded zip a
 
 ## Roadmap:
 
-- Automatic weight painting (is now available on v2.2.0 alpha
+- Automatic weight painting (is now available on v2.2.0 alpha)
 - Hair simulation and animation related features
 - Improvements for hair cards creation
 
