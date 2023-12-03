@@ -20,4 +20,4 @@ assignees: ''
 [If applicable, add media here to describe your idea.]
 
 **Additional context**
-[Please add any other context or screenshots about the feature request here.]
+[Please add any other context about the feature request here.]
