@@ -29,4 +29,4 @@ Worked: [Please put the newest version of GBH Tool that worked as expected here.
 [If applicable, add screenshots to help explain your problem.]
 
 **Additional context**
-[Add any other context about the problem here.]
+[Please add any other context or screenshots about the feature request here.]
