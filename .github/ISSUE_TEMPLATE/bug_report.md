@@ -8,12 +8,15 @@ assignees: ''
 ---
 
 **System Information**
-Operating system:  [Please put your operating system name, version, build version and architecture here.]
-Graphics card: [Please put your graphics card model, driver version here.]
+Operating system:  [Please put your operating system info here.]
 
 **Blender Version**
 Broken:  [Please put the version of Blender that the bug exists in, here.]
 Worked: [Please put the newest version of Blender that worked as expected here.]
+
+**GBH Tool Version**
+Broken:  [Please put the version of GBH Tool that the bug exists in, here.]
+Worked: [Please put the newest version of GBH Tool that worked as expected here.]
 
 **Short description of error**
 [Please fill out a short description of the error here.]
