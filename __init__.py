@@ -6,7 +6,7 @@
 
 bl_info = {
     "name": "GBH Tool",
-    "author": "Gixo <notgixo@proton.me>",
+    "author": "Gixo <GixoXYZ@proton.me>",
     "description": "Gixo's Blender Hair Tool generates different hair styles using Blender's new hair system.",
     "blender": (3, 5, 0),
     "version": (2, 2, 0, "alpha", 3),
@@ -14,7 +14,7 @@ bl_info = {
     "warning": "",
     "support": "COMMUNITY",
     "category": "Object",
-    "doc_url": "https://notgixo.github.io/GBHToolDocs/",
+    "doc_url": "https://GixoXYZ.github.io/GBHToolDocs/",
 }
 
 from . import global_variables as gv

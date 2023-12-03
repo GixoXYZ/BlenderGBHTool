@@ -17,8 +17,8 @@ UPDATE_INTERNET_FAIL = "Failed to connect to update server."
 UPDATE_GET_FAIL = "Failed to retrieve updates."
 UPDATE_NEW = "New update available."
 UPDATE_NO_NEW = "No new updates available."
-RELEASE_URL_LATEST = "https://api.github.com/repos/notgixo/BlenderGBHTool/releases/latest"
-RELEASE_URL_ALL = "https://api.github.com/repos/notgixo/BlenderGBHTool/releases"
+RELEASE_URL_LATEST = "https://api.github.com/repos/GixoXYZ/BlenderGBHTool/releases/latest"
+RELEASE_URL_ALL = "https://api.github.com/repos/GixoXYZ/BlenderGBHTool/releases"
 
 
 def check_for_updates():
