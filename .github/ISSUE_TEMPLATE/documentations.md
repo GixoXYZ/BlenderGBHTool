@@ -1,6 +1,6 @@
 ---
 name: Documentations
-about: Describe this issue template's purpose here.
+about: Streamline the creation and updating of project documentation.
 title: 'docs(<scope>): <title>'
 labels: documentation
 assignees: GixoXYZ
