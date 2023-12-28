@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea for this project.
 title: 'feat(<scope>): <title>'
-labels: ''
+labels: enhancement
 assignees: GixoXYZ
 
 ---

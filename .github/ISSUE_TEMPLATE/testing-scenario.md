@@ -2,7 +2,7 @@
 name: Testing scenario
 about: Provide an overview of the testing procedure for a feature or area of the code.
 title: 'test(<scope>): <title>'
-labels: ''
+labels: test
 assignees: GixoXYZ
 
 ---
