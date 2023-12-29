@@ -35,7 +35,7 @@ In Blender: Edit -> Preferences -> Add-ons -> Install -> Select downloaded zip a
 
 ## Requirements:
 
-- Blender 3.5
+- Blender 3.5 and later
 
 --- 
 
