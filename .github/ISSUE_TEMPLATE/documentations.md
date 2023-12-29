@@ -7,9 +7,6 @@ assignees: GixoXYZ
 
 ---
 
-**Summary**
-[Provide a brief but clear summary of the documentation task.]
-
 **Description**
 [Provide a detailed description of the documentation task, including what needs to be documented and any specific information or requirements.]
 
@@ -22,13 +19,11 @@ assignees: GixoXYZ
 **Additional Context**
 [Include any additional context or background information that might be helpful.]
 
-**Deadline**
-[Specify if there is a deadline for completing the documentation task.]
-
 **Related Issues**
 [Link to any related issues or tasks.]
 
 **Checklist**
+
 - [ ] Draft the documentation
 - [ ] Review and edit for clarity
 - [ ] Ensure consistency with existing documentation

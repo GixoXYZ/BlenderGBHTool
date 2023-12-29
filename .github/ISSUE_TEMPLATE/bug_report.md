@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve.
 title: 'fix(<scope>): <title>'
-labels: bug
+labels: bug, test
 assignees: GixoXYZ
 
 ---
