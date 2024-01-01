@@ -4,8 +4,8 @@ import bpy
 import requests
 import re
 import threading
+import time
 
-from urllib.parse import quote
 from bpy.types import Operator
 from bpy.props import StringProperty
 
@@ -41,7 +41,6 @@ class GBH_OT_gh_issues(Operator):
                 return response.text if response.status_code == 200 else None
             except (requests.exceptions.ConnectionError, requests.exceptions.RequestException) as err:
                 print(f"GBH Tool: {err}")
-                # TODO: add error reporting.
                 return None
 
         def extract_title_and_labels(template_content):
@@ -89,10 +88,8 @@ class GBH_OT_gh_issues(Operator):
                         .replace("[Please put the version of GBH Tool that the bug exists in, here.]", f"version: {gbh_version}")
                     )
 
-                    print(body)
                     # Remove possible trailing new lines, and use double spaces for new lines.
                     body = body.rstrip("\n").replace("\n", "%0A")
-                    print(body)
 
                 else:
                     body = (
@@ -107,9 +104,16 @@ class GBH_OT_gh_issues(Operator):
 
             github_url = f"https://github.com/GixoXYZ/BlenderGBHTool/issues/new?template={issue_type}.md&assignees={assignees}&title={title}&labels={labels}&body={body}"
             bpy.ops.wm.url_open(url=github_url)
+            gv.fetch_template_message = ""
 
         else:
-            print("Failed to fetch the GitHub issue template.")
+            issue_name = (re.sub(r"\d+--", "", issue_type)).replace("-", " ")
+            err = f"Failed to fetch {issue_name} template. Please check your internet connection."
+            print(f"GBH Tool: {err}")
+            gv.fetch_template_message = err
+            cf.redraw_area_ui("VIEW_3D")
+            time.sleep(10)
+            gv.fetch_template_message = ""
 
         if issue_type == "01--bug-report":
             gv.bug_template_fetching = False

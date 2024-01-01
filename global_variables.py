@@ -51,3 +51,4 @@ update_info_url = "https://github.com/GixoXYZ/BlenderGBHTool/releases/latest"
 # Github.
 bug_template_fetching = False
 feat_template_fetching = False
+fetch_template_message = ""

@@ -62,6 +62,15 @@ class VIEW3D_PT_info_ui_main(Panel, GBHBasePanel):
         else:
             bug.operator("gbh.gh_issues", icon_value=icon, text="Report a Bug").issue_type = "01--bug-report"
 
+        if gv.fetch_template_message != "":
+            col = box.column()
+            col.label(text="An Error Occurred!", icon="ERROR")
+            multi_line_text(
+                context=context,
+                text=gv.fetch_template_message,
+                parent=box
+            )
+
         box = layout.box()
         col = box.column()
         col.label(text="Common Pitfalls")
