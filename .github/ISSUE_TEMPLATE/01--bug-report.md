@@ -1,5 +1,5 @@
 ---
-name: Bug report
+name: 01. Bug Report
 about: Create a report to help us improve.
 title: 'fix(<scope>): <title>'
 labels: bug, not checked

@@ -1,5 +1,5 @@
 ---
-name: Feature request
+name: 02. Feature Request
 about: Suggest an idea for this project.
 title: 'feat(<scope>): <title>'
 labels: enhancement, not checked

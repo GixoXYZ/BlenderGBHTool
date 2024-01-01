@@ -1,5 +1,5 @@
 ---
-name: Refactor
+name: 03. Refactor (Devs Only)
 about: 'Provide an overview of the refactoring procedure for a feature or area of
   the code. '
 title: 'refactor(<scope>): <title>'

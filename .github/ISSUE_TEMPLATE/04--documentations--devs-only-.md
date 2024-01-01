@@ -1,5 +1,5 @@
 ---
-name: Documentations
+name: 04. Documentations (Devs Only)
 about: Streamline the creation and updating of project documentation.
 title: 'docs(<scope>): <title>'
 labels: documentation
