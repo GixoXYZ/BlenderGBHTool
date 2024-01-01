@@ -47,6 +47,6 @@ In Blender: Edit -> Preferences -> Add-ons -> Install -> Select downloaded zip a
 
 ## License:
 
-GPL-2.0-or-later
+[GPL-2.0-or-later](https://spdx.org/licenses/GPL-2.0-or-later.html)
 
 ---
