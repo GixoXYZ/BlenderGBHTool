@@ -8,14 +8,14 @@ assignees: GixoXYZ
 ---
 
 **System Information**
-Operating system:  [Please put your operating system info here.]
+Operating system: [Please put your operating system info here.]
 
 **Blender Version**
-Broken:  [Please put the version of Blender that the bug exists in, here.]
+Broken: [Please put the version of Blender that the bug exists in, here.]
 Worked: [Please put the newest version of Blender that worked as expected here.]
 
 **GBH Tool Version**
-Broken:  [Please put the version of GBH Tool that the bug exists in, here.]
+Broken: [Please put the version of GBH Tool that the bug exists in, here.]
 Worked: [Please put the newest version of GBH Tool that worked as expected here.]
 
 **Short description of error**
