@@ -13,6 +13,7 @@ URL_CONTACT = "https://GixoXYZ.github.io"
 URL_GITHUB = "https://github.com/GixoXYZ/BlenderGBHTool"
 URL_GUMROAD = "https://gixo.gumroad.com/l/GBHTool"
 URL_ISSUE = "https://github.com/GixoXYZ/BlenderGBHTool/issues/new"
+URL_DISCUSS = "https://github.com/GixoXYZ/BlenderGBHTool/discussions/8"
 
 
 URL_YOUTUBE = "https://www.youtube.com/playlist?list=PLFexHVb3hTS5wZYhBsFuzS574-5uv1RZ5"
@@ -46,3 +47,7 @@ INVALID_PATH = "Selected path is not valid."
 update_checking = False
 update_url = "https://github.com/GixoXYZ/BlenderGBHTool/releases"
 update_info_url = "https://github.com/GixoXYZ/BlenderGBHTool/releases/latest"
+
+# Github.
+bug_template_fetching = False
+feat_template_fetching = False

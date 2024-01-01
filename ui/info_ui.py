@@ -34,7 +34,7 @@ class VIEW3D_PT_info_ui_main(Panel, GBHBasePanel):
             "Contact": {"url": gv.URL_CONTACT, "icon": "Contact"},
             "Gumroad": {"url": gv.URL_GUMROAD, "icon": "Gumroad"},
             "Github": {"url": gv.URL_GITHUB, "icon": "Github"},
-            "Report Problems": {"url": gv.URL_ISSUE, "icon": "Issue"},
+            "Questions and Discussions": {"url": gv.URL_DISCUSS, "icon": "Discuss"},
         }
 
         for key, button_data in links.items():
@@ -45,6 +45,22 @@ class VIEW3D_PT_info_ui_main(Panel, GBHBasePanel):
                 button_data["icon"],
                 button_data["url"]
             )
+
+        pcoll = get_icons()
+        icon = pcoll["Issue"].icon_id
+        feat = col.column()
+        if gv.feat_template_fetching:
+            feat.enabled = False
+            feat.operator("gbh.gh_issues", icon_value=icon, text="Fetching Feature Request Template...")
+        else:
+            feat.operator("gbh.gh_issues", icon_value=icon, text="Feature Request").issue_type = "02--feature-request"
+
+        bug = col.column()
+        if gv.bug_template_fetching:
+            bug.enabled = False
+            bug.operator("gbh.gh_issues", icon_value=icon, text="Fetching Bug Report Template...")
+        else:
+            bug.operator("gbh.gh_issues", icon_value=icon, text="Report a Bug").issue_type = "01--bug-report"
 
         box = layout.box()
         col = box.column()

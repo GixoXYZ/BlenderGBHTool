@@ -32,6 +32,7 @@ if "bpy" in locals():
     importlib.reload(presets_ops)
     importlib.reload(hair_card_ops)
     importlib.reload(ui_ops)
+    importlib.reload(info_ops)
     importlib.reload(update_ui)
     importlib.reload(landing_ui)
     importlib.reload(node_groups_ui)
@@ -65,6 +66,7 @@ else:
         convert_ops,
         update_ops,
         ui_ops,
+        info_ops,
     )
     from . import (
         icons,
@@ -85,6 +87,7 @@ modules = [
     presets_ops,
     hair_card_ops,
     ui_ops,
+    info_ops,
     update_ui,
     landing_ui,
     node_groups_ui,
