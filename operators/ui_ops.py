@@ -9,6 +9,9 @@ from .. import global_variables as gv
 addon_keymaps = []
 
 
+# TODO: Rethink the categorization of this file's content. Specifically hotkeys should be moved to another location.
+
+
 def add_hotkey():
     pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
     wm = bpy.context.window_manager
@@ -55,6 +58,13 @@ def remove_hotkey():
         km.keymap_items.remove(kmi)
 
     addon_keymaps.clear()
+
+
+# Show a custom pop-up menu with a message.
+def popup_menu(message: str, title="", icon="INFO") -> None:
+    def draw(self, context):
+        self.layout.label(text=message)
+    bpy.context.window_manager.popup_menu(draw, title=title, icon=icon)
 
 
 class GBH_OT_panel_focus(Operator):
