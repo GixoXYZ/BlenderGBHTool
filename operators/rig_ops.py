@@ -40,7 +40,7 @@ def _add_parent_bone(scene, context, armature_name, parent_size):
 def _set_parent_armature(context, parent_armature, parent_bone_name):
     if parent_armature is not None:
         hair_armature = context.active_object
-        if parent_bone_name != "None":
+        if parent_bone_name != "Active Bone" and parent_bone_name is not None:
             cf.set_active_bone(context, parent_armature, parent_bone_name)
         cf.select_objects(context, hair_armature, parent_armature)
         bpy.ops.object.parent_set(type="BONE")
@@ -217,7 +217,6 @@ class GBH_OT_hair_to_armature(Operator):
                 _add_parent_bone(scene, context, armature_name, parent_size)
 
             elif gbh_rig.arm_add_parent_bone == "ARM":
-                print("del")
                 # Clear armature and bone parent pointers if the parent armature was deleted manually.
                 clear_pointer_if_object_deleted(context, gbh_rig, "arm_parent_armature")
                 # Clear parent for when the armature was deleted manually or its pointer was cleared.

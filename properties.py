@@ -40,7 +40,7 @@ def _parent_bone_armature_poll(self, obj):
 
 
 def _get_obj_bones_names(self, context):
-    bone_names = ["None"]
+    bone_names = ["Active Bone"]
 
     if (
         parent_armature := context.window_manager.gbh_rig.arm_parent_armature
@@ -92,7 +92,7 @@ def _arm_update(self, context):
 def _arm_parent_armature_update(self, context):
     wm = context.window_manager
     gbh_rig = wm.gbh_rig
-    gbh_rig.arm_parent_bone = "None"
+    gbh_rig.arm_parent_bone = "Active Bone"
 
 
 """Hair Card update functions"""
