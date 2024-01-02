@@ -26,6 +26,18 @@ def set_active_object(context, active_object):
         context.view_layer.objects.active = active_object
 
 
+def set_active_bone(context, armature, active_bone_name):
+    """Set the given bone as active bone"""
+    if context.active_object:
+        bpy.ops.object.mode_set(mode="OBJECT")
+
+    if armature:
+        bpy.ops.object.select_all(action="DESELECT")
+        armature.select_set(state=True, view_layer=context.view_layer)
+        context.view_layer.objects.active = armature
+        armature.data.bones.active = armature.data.bones[active_bone_name]
+
+
 def select_objects(context, objects, active_object):
     """Select multiple objects and set the given one as active object"""
     if context.active_object:

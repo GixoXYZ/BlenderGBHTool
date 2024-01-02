@@ -4,7 +4,7 @@ import bpy
 from bpy.types import Panel
 
 from ..global_variables import GBH_PACKAGE
-from . common_ui import GBHBasePanel, box_sub_panel
+from . common_ui import GBHBasePanel, box_sub_panel, clear_pointer_if_object_deleted
 
 
 class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
@@ -77,21 +77,31 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
                 text="Reverse Chains Direction",
                 icon=icon
             )
-            col = box.column()
-            col.prop(
-                gbh_rig,
-                "arm_add_parent_bone",
-                text="Add Parent Bone",
-                icon="BONE_DATA"
-            )
-            if gbh_rig.arm_add_parent_bone:
-                col.prop(gbh_rig, "arm_parent_size")
-                col.label(text="Parent Bone Name")
-                col.prop(gbh_rig, "arm_name_parent_bone", text="")
 
             col = box.column(align=True)
             col.prop(gbh_rig, "arm_start", text="Chains Start Point Trim")
             col.prop(gbh_rig, "arm_end", text="Chains End Point Trim")
+
+            col = box.column()
+            col.label(text="Parent Bone", icon="BONE_DATA")
+            col.prop(
+                gbh_rig,
+                "arm_add_parent_bone",
+                text="",
+            )
+            if gbh_rig.arm_add_parent_bone == "BONE":
+                col.prop(gbh_rig, "arm_parent_size")
+                col.label(text="Parent Bone Name")
+                col.prop(gbh_rig, "arm_name_parent_bone", text="")
+
+            elif gbh_rig.arm_add_parent_bone == "ARM":
+                # Clear parent armature and bone pointers if parent object was deleted manually.
+                clear_pointer_if_object_deleted(context, gbh_rig, "arm_parent_armature")
+
+                col.label(text="Parent Armature")
+                col.prop(gbh_rig, "arm_parent_armature", text="")
+                col.label(text="Parent Bone")
+                col.prop(gbh_rig, "arm_parent_bone", text="")
 
             box = body.box()
             col = box.column()

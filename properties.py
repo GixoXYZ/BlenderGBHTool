@@ -26,6 +26,30 @@ def _hair_object_poll(self, obj):
         return obj.type
 
 
+"""Rigging poll functions"""
+
+
+def _parent_bone_armature_poll(self, obj):
+    valid_obj_type = ["ARMATURE"]
+    if obj.type in valid_obj_type and obj in list(bpy.context.scene.objects):
+        hair_object_name = bpy.context.scene.hair_object.name
+        return obj.type if obj.data.name != f"{hair_object_name}_Armature" else None
+
+
+"""Rigging items return functions"""
+
+
+def _get_obj_bones_names(self, context):
+    bone_names = ["None"]
+
+    if (
+        parent_armature := context.window_manager.gbh_rig.arm_parent_armature
+    ):
+        # Iterate through all bones in the armature.
+        bone_names.extend(sorted((bone.name for bone in parent_armature.data.bones)))
+    return [(name, name, "") for name in bone_names]
+
+
 """Presets update functions"""
 
 
@@ -63,6 +87,12 @@ def _arm_update(self, context):
     gbh_rig = wm.gbh_rig
     if gbh_rig.arm_live_preview:
         bpy.ops.gbh.hair_to_armature()
+
+
+def _arm_parent_armature_update(self, context):
+    wm = context.window_manager
+    gbh_rig = wm.gbh_rig
+    gbh_rig.arm_parent_bone = "None"
 
 
 """Hair Card update functions"""
@@ -293,10 +323,28 @@ class GBH_RigProperties(PropertyGroup):
         description="Reverse bone chains direction",
         update=_arm_update,
     )
-    arm_add_parent_bone: BoolProperty(
-        name="Add Parent Bone",
-        description="Add parent bone to armature",
-        default=True,
+    arm_add_parent_bone: EnumProperty(
+        name="Parent Bone",
+        description="Parent bone creation / selection",
+        default="NONE",
+        items=[
+            ("NONE", "None", ""),
+            ("BONE", "Add Parent Bone to Armature", ""),
+            ("ARM", "Select Parent Bone from Another Armature", ""),
+        ],
+        update=_arm_update,
+    )
+    arm_parent_armature: PointerProperty(
+        name="Parent Armature",
+        description="Parent armature selection",
+        type=bpy.types.Object,
+        poll=_parent_bone_armature_poll,
+        update=_arm_parent_armature_update,
+    )
+    arm_parent_bone: EnumProperty(
+        name="Parent Bone",
+        description="List of bones from selected armature",
+        items=_get_obj_bones_names,
         update=_arm_update,
     )
     arm_use_mods: BoolProperty(

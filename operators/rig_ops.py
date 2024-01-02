@@ -7,6 +7,7 @@ from mathutils import Vector
 
 from ..global_variables import DIR_ASSETS, PRE_MADE_NODES_FILE
 from . import common_functions as cf
+from ..ui.common_ui import clear_pointer_if_object_deleted
 
 
 def _add_parent_bone(scene, context, armature_name, parent_size):
@@ -34,6 +35,16 @@ def _add_parent_bone(scene, context, armature_name, parent_size):
             edit_bones.active.parent = edit_bones[parent_name]
 
     bpy.ops.object.mode_set(mode="OBJECT")
+
+
+def _set_parent_armature(context, parent_armature, parent_bone_name):
+    if parent_armature is not None:
+        hair_armature = context.active_object
+        if parent_bone_name != "None":
+            cf.set_active_bone(context, parent_armature, parent_bone_name)
+        cf.select_objects(context, hair_armature, parent_armature)
+        bpy.ops.object.parent_set(type="BONE")
+        cf.set_active_object(context, hair_armature)
 
 
 def _rename_bones(scene, context, armature_name):
@@ -201,9 +212,20 @@ class GBH_OT_hair_to_armature(Operator):
         try:
             _apply_skin_modifier(context, dummy_mesh, armature_name)
             _rename_bones(scene, context, armature_name)
-            if gbh_rig.arm_add_parent_bone:
+            if gbh_rig.arm_add_parent_bone == "BONE":
                 parent_size = gbh_rig.arm_parent_size / 100
                 _add_parent_bone(scene, context, armature_name, parent_size)
+
+            elif gbh_rig.arm_add_parent_bone == "ARM":
+                print("del")
+                # Clear armature and bone parent pointers if the parent armature was deleted manually.
+                clear_pointer_if_object_deleted(context, gbh_rig, "arm_parent_armature")
+                # Clear parent for when the armature was deleted manually or its pointer was cleared.
+                bpy.ops.object.parent_clear(type="CLEAR")
+
+                parent_armature = gbh_rig.arm_parent_armature
+                parent_bone_name = gbh_rig.arm_parent_bone
+                _set_parent_armature(context, parent_armature, parent_bone_name)
 
             _clean_up(dummy_mesh, convert_ng, hair_duple)
             return {"FINISHED"}
@@ -234,7 +256,7 @@ class GBH_OT_automatic_weight_paint(Operator):
 
         org_hair_object = scene.hair_object
         org_parent_bone = gbh_rig.arm_add_parent_bone
-        gbh_rig.arm_add_parent_bone = False
+        gbh_rig.arm_add_parent_bone = "NONE"
 
         try:
             bpy.ops.gbh.convert_hair(convert_to="MESH")
@@ -364,7 +386,7 @@ class GBH_OT_automatic_weight_paint(Operator):
         context.object.name = mesh_name
         context.object.data.name = mesh_name
 
-        if gbh_rig.arm_add_parent_bone:
+        if gbh_rig.arm_add_parent_bone == "BONE":
             parent_size = gbh_rig.arm_parent_size / 100
             _add_parent_bone(scene, context, armature_name, parent_size)
 
