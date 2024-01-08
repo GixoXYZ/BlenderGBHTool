@@ -68,6 +68,8 @@ def clear_pointer_if_object_deleted(context, prop_parent, prop_pointer):
     if attr := getattr(prop_parent, prop_pointer):
         if not context.scene.objects.get(attr.name):
             # Set the property to None. This way calls the update function of properties as well.
-            setattr(prop_parent, prop_pointer, None)
 
-            # prop_parent.property_unset(prop_pointer)
+            if hasattr(context.scene, prop_pointer):
+                prop_parent.property_unset(prop_pointer)
+            else:
+                setattr(prop_parent, prop_pointer, None)
