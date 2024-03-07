@@ -368,24 +368,25 @@ class GBHPreferences(AddonPreferences):
         col = box.column()
         col.label(text="Add-on Updates:")
         row = col.row()
-        row.scale_y = 1.3
+        update_button = row.row()
+        update_button.scale_y = 1.3
         if gv.update_checking:
-            row.enabled = False
-            row.operator("gbh.update_check", icon="FILE_REFRESH", text="Checking for Updates...")
+            update_button.enabled = False
+            update_button.operator("gbh.update_check", icon="FILE_REFRESH", text="Checking for Updates...")
 
         elif self.update_available:
-            row.operator(
+            update_button.operator(
                 "gbh.update_check",
                 text="",
                 icon="FILE_REFRESH"
             )
-            row.operator(
+            update_button.operator(
                 "wm.url_open",
                 icon="IMPORT",
                 text=f"Download GBH Tool {self.update_latest_version}"
             ).url = gv.update_url
 
-            sub_row = row.row()
+            sub_row = update_button.row()
             sub_row.scale_x = 0.6
             sub_row.operator(
                 "wm.url_open",
@@ -394,7 +395,7 @@ class GBHPreferences(AddonPreferences):
             ).url = gv.update_info_url
 
         else:
-            row.operator("gbh.update_check", icon="FILE_REFRESH")
+            update_button.operator("gbh.update_check", icon="FILE_REFRESH")
 
         row.prop(self, "preview_update")
         row = col.row()
