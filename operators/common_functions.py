@@ -274,6 +274,13 @@ def set_object_location(obj, location):
         objects[obj.name].location = location
 
 
+def set_object_scale(obj, scale):
+    """Sets object scale to given location"""
+    objects = bpy.data.objects
+    if objects.get(obj.name):
+        objects[obj.name].scale = scale
+
+
 def set_object_rotation(obj, rotation):
     """Sets object rotation to given rotation in degrees"""
     objects = bpy.data.objects
