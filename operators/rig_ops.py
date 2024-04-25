@@ -162,6 +162,7 @@ class GBH_OT_hair_to_armature(Operator):
         rotation = hair_object.rotation_euler
         scale = (hair_object.scale * hair_object.parent.scale)
 
+        scale = hair_object.scale
         # Check if rig maker node group doesn't already exist in file.
         if not convert_node_group:
             path = os.path.join(DIR_ASSETS, PRE_MADE_NODES_FILE)
@@ -173,16 +174,7 @@ class GBH_OT_hair_to_armature(Operator):
         cf.set_object_rotation(dummy_mesh, rotation)
         cf.set_object_scale(dummy_mesh, scale)
 
-        hair_duple = cf.duplicate_item(
-            context,
-            scene,
-            hair_object,
-            duple_name,
-            False
-        )
-        cf.set_object_location(hair_duple, location)
-        cf.set_object_rotation(hair_duple, rotation)
-        cf.set_object_scale(hair_duple, scale)
+        hair_duple = cf.duplicate_item(context, hair_object, duple_name, False)
 
         if gbh_rig.arm_use_mods:
             _use_mods(context, hair_object, hair_duple)

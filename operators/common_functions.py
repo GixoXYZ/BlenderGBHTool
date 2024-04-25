@@ -231,21 +231,24 @@ def convert_object(context, obj, target):
     bpy.ops.object.convert(target=target)
 
 
-def duplicate_item(context, scene, source_item, duplicate_name, apply_transform):
+def duplicate_item(context, source_item, duplicate_name, apply_transform):
     """Duplicate object using its data block"""
-    duple_data = source_item.data.copy()
-    duple_data.name = duplicate_name
-    duple_object = _link_to_scene(duple_data.name, duple_data, scene)
 
+    initial_active_object = context.object
+    set_active_object(context, source_item)
+    bpy.ops.object.duplicate()
+
+    item_duple = context.object
+    item_duple.name = duplicate_name
+    item_duple.data.name = duplicate_name
     if apply_transform:
-        set_active_object(context, duple_object)
         bpy.ops.object.transform_apply(
             location=True,
             rotation=True,
             scale=True
         )
-
-    return duple_object
+    set_active_object(context, initial_active_object)
+    return item_duple
 
 
 def copy_modifiers(context, source_object, target_object, clear_existing_modifiers):

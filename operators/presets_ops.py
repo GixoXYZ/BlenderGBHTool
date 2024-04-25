@@ -109,7 +109,6 @@ class GBH_OT_save_preset(Operator):
             elif dif_name_than_hair and presets_type == "OBJECT":
                 dummy_object = cf.duplicate_item(
                     context,
-                    scene,
                     source_object,
                     object_name,
                     False
