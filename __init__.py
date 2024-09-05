@@ -3,19 +3,8 @@
 # A portion of this program includes code from Antti Tikka's Modifier List Blender add-on released in April 1, 2022.
 # Modifier List's code is used under the terms of the GNU General Public License v3.
 
-
-bl_info = {
-    "name": "GBH Tool",
-    "author": "Gixo <GixoXYZ@proton.me>",
-    "description": "Gixo's Blender Hair Tool generates different hair styles using Blender's new hair system.",
-    "blender": (3, 5, 0),
-    "version": (2, 2, 0, "alpha", 3),
-    "location": "View3D > Toolshelf > GBH Tool",
-    "warning": "",
-    "support": "COMMUNITY",
-    "category": "Object",
-    "doc_url": "https://GixoXYZ.github.io/GBHToolDocs/",
-}
+import toml
+import os
 
 from . import global_variables as gv
 
@@ -102,9 +91,12 @@ modules = [
 
 
 def register():
-
-    gv.GBH_VERSION = list(bl_info["version"])
-
+    script_dir = os.path.dirname(__file__)
+    file_path = os.path.join(script_dir, "blender_manifest.toml")
+    with open(file_path, "r") as file:
+        manifest_data = toml.load(file)
+        version = manifest_data["version"]
+        gv.GBH_VERSION = [int(part) for part in version.split('.')]
     for module in modules:
         module.register()
 
