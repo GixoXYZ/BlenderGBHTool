@@ -56,9 +56,21 @@ def _rename_bones(scene, context, armature_name):
 
     for chain_index, root_bone in enumerate(root_bones, start=1):
         bone_index = 1
-        root_bone.name = f"{gbh_rig.arm_name_chain}{chain_index}{gbh_rig.arm_name_separator}{gbh_rig.arm_name_bone}{bone_index}"
+        root_bone.name = (
+            f"{gbh_rig.arm_name_chain}"
+            f"{chain_index}"
+            f"{gbh_rig.arm_name_separator}"
+            f"{gbh_rig.arm_name_bone}"
+            f"{bone_index}"
+        )
         for bone in root_bone.children_recursive:
-            bone.name = f"{gbh_rig.arm_name_chain}{chain_index}{gbh_rig.arm_name_separator}{gbh_rig.arm_name_bone}{bone_index + 1}"
+            bone.name = (
+                f"{gbh_rig.arm_name_chain}"
+                f"{chain_index}"
+                f"{gbh_rig.arm_name_separator}"
+                f"{gbh_rig.arm_name_bone}"
+                f"{bone_index + 1}"
+            )
             bone_index += 1
 
 
@@ -318,7 +330,14 @@ class GBH_OT_automatic_weight_paint(Operator):
             name = mesh.name.replace("Mesh", "Armature")
             active_object = bpy.data.objects[name]
             for bone_index, bone in enumerate(active_object.data.bones):
-                bone.name = f"{gbh_rig.arm_name_chain}{mesh_index + 1}{gbh_rig.arm_name_separator}{gbh_rig.arm_name_bone}{bone_index + 1}"
+                bone.name = (
+                    f"{gbh_rig.arm_name_chain}"
+                    f"{mesh_index + 1}"
+                    f"{gbh_rig.arm_name_separator}"
+                    f"{gbh_rig.arm_name_bone}"
+                    f"{bone_index + 1}"
+                )
+
             arm_objs.append(active_object)
             cf.select_objects(context, mesh, active_object)
 
