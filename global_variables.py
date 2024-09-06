@@ -8,8 +8,8 @@ GBH_PACKAGE = __package__
 GBH_VERSION = None
 
 # URLs.
-URL_DOCS = "https://GixoXYZ.github.io/GBHToolDocs/"
-URL_CONTACT = "https://GixoXYZ.github.io"
+URL_DOCS = "https://gixo.xyz/GBHToolDocs/"
+URL_CONTACT = "https://gixo.xyz"
 URL_GITHUB = "https://github.com/GixoXYZ/BlenderGBHTool"
 URL_GUMROAD = "https://gixo.gumroad.com/l/GBHTool"
 URL_ISSUE = "https://github.com/GixoXYZ/BlenderGBHTool/issues/new"

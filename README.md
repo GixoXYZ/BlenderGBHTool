@@ -21,7 +21,7 @@ GBH Tool is a procedural hair add-on for Blender.
 - Hair rigging
 - Hair card texture creation
 
-Check out [GBH Tool Manual](https://GixoXYZ.github.io/GBHToolDocs/) for more details.
+Check out [GBH Tool Manual](https://gixo.xyz/GBHToolDocs/) for more details.
 
 ---
 
