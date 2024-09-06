@@ -224,9 +224,10 @@ class GBH_OT_hair_to_armature(Operator):
 
             elif gbh_rig.arm_add_parent_bone == "ARM":
                 # Clear armature and bone parent pointers if the parent armature was deleted manually.
+                org_arm_live_preview = gbh_rig.arm_live_preview
                 gbh_rig.arm_live_preview = False
                 clear_pointer_if_object_deleted(context, gbh_rig, "arm_parent_armature")
-                gbh_rig.arm_live_preview = True
+                gbh_rig.arm_live_preview = org_arm_live_preview
                 # Clear parent for when the armature was deleted manually or its pointer was cleared.
                 bpy.ops.object.parent_clear(type="CLEAR")
 
@@ -407,9 +408,10 @@ class GBH_OT_automatic_weight_paint(Operator):
 
         elif gbh_rig.arm_add_parent_bone == "ARM":
             # Clear armature and bone parent pointers if the parent armature was deleted manually.
+            org_arm_live_preview = gbh_rig.arm_live_preview
             gbh_rig.arm_live_preview = False
             clear_pointer_if_object_deleted(context, gbh_rig, "arm_parent_armature")
-            gbh_rig.arm_live_preview = True
+            gbh_rig.arm_live_preview = org_arm_live_preview
 
             parent_armature = gbh_rig.arm_parent_armature
             parent_bone_name = gbh_rig.arm_parent_bone
