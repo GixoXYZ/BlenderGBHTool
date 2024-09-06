@@ -43,7 +43,7 @@ Operators
 
 class GBH_OT_convert_hair(Operator):
     bl_idname = "gbh.convert_hair"
-    bl_label = "Convert Cards to Mesh"
+    bl_label = "Convert Hair"
     bl_description = "Convert the modified hair into a new object"
     bl_options = {"REGISTER", "UNDO"}
 
