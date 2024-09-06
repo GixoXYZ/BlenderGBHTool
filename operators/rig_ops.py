@@ -37,14 +37,13 @@ def _add_parent_bone(scene, context, armature_name, parent_size):
     bpy.ops.object.mode_set(mode="OBJECT")
 
 
-def _set_parent_armature(context, parent_armature, parent_bone_name):
+def _set_parent_armature(context, obj, parent_armature, parent_bone_name):
     if parent_armature is not None:
-        hair_armature = context.active_object
         if parent_bone_name != "Active Bone" and parent_bone_name is not None:
             cf.set_active_bone(context, parent_armature, parent_bone_name)
-        cf.select_objects(context, hair_armature, parent_armature)
+        cf.select_objects(context, obj, parent_armature)
         bpy.ops.object.parent_set(type="BONE")
-        cf.set_active_object(context, hair_armature)
+        cf.set_active_object(context, obj)
 
 
 def _rename_bones(scene, context, armature_name):
@@ -225,13 +224,16 @@ class GBH_OT_hair_to_armature(Operator):
 
             elif gbh_rig.arm_add_parent_bone == "ARM":
                 # Clear armature and bone parent pointers if the parent armature was deleted manually.
+                gbh_rig.arm_live_preview = False
                 clear_pointer_if_object_deleted(context, gbh_rig, "arm_parent_armature")
+                gbh_rig.arm_live_preview = True
                 # Clear parent for when the armature was deleted manually or its pointer was cleared.
                 bpy.ops.object.parent_clear(type="CLEAR")
 
                 parent_armature = gbh_rig.arm_parent_armature
                 parent_bone_name = gbh_rig.arm_parent_bone
-                _set_parent_armature(context, parent_armature, parent_bone_name)
+                obj = context.active_object
+                _set_parent_armature(context, obj, parent_armature, parent_bone_name)
 
             _clean_up(dummy_mesh, convert_ng, hair_duple)
             return {"FINISHED"}
@@ -390,7 +392,7 @@ class GBH_OT_automatic_weight_paint(Operator):
 
         cf.select_objects(context, arm_objs, arm_objs[0])
         bpy.ops.object.join()
-
+        joined_armature = context.object
         context.object.name = armature_name
         context.object.data.name = armature_name
 
@@ -402,6 +404,16 @@ class GBH_OT_automatic_weight_paint(Operator):
         if gbh_rig.arm_add_parent_bone == "BONE":
             parent_size = gbh_rig.arm_parent_size / 100
             _add_parent_bone(scene, context, armature_name, parent_size)
+
+        elif gbh_rig.arm_add_parent_bone == "ARM":
+            # Clear armature and bone parent pointers if the parent armature was deleted manually.
+            gbh_rig.arm_live_preview = False
+            clear_pointer_if_object_deleted(context, gbh_rig, "arm_parent_armature")
+            gbh_rig.arm_live_preview = True
+
+            parent_armature = gbh_rig.arm_parent_armature
+            parent_bone_name = gbh_rig.arm_parent_bone
+            _set_parent_armature(context, joined_armature, parent_armature, parent_bone_name)
 
         context.scene["hair_object"].hide_set(True)
 
