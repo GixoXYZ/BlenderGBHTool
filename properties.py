@@ -361,17 +361,13 @@ class GBH_RigProperties(PropertyGroup):
     )
     wp_clear_from_roots_switch: BoolProperty(
         name="Clear Weight Paint from Root",
-        default=False,
+        default=True,
     )
     wp_clear_from_roots_distance: FloatProperty(
         name="Distance from Root (cm)",
-        default=5,
+        default=2.5,
         soft_max=100,
         min=0,
-    )
-    wp_fix_duplicated_mesh_switch: BoolProperty(
-        name="Fix Duplicated Mesh",
-        default=True
     )
     wp_tweak_levels_switch: BoolProperty(
         name="Tweak Levels",

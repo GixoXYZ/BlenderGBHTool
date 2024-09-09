@@ -94,26 +94,25 @@ class GBH_OT_save_preset(Operator):
         source_object = scene.hair_object
         # Save preset if it doesn't already exists, the name is not blank and the list items count is under 100.
         if object_name and object_name not in blend_files and len(blend_files) < 100:
-            presets_type = gbh_presets.presets_hair_type
             dif_name_than_hair = source_object.name != object_name
-            if dif_name_than_hair and presets_type != "OBJECT":
-                dummy_object = cf.create_new_item(
-                    context,
-                    scene,
-                    object_name,
-                    "CURVES"
-                )
-                cf.copy_modifiers(context, source_object, dummy_object, True)
-                cf.set_active_object(context, dummy_object)
-
-            elif dif_name_than_hair and presets_type == "OBJECT":
-                dummy_object = cf.duplicate_item(
-                    context,
-                    source_object,
-                    object_name,
-                    False
-                )
-                cf.copy_modifiers(context, source_object, dummy_object, True)
+            if dif_name_than_hair:
+                presets_type = gbh_presets.presets_hair_type
+                if presets_type != "OBJECT":
+                    dummy_object = cf.create_new_item(
+                        context,
+                        scene,
+                        object_name,
+                        "CURVES"
+                    )
+                    cf.copy_modifiers(context, source_object, dummy_object, True)
+                else:
+                    dummy_object = cf.duplicate_item(
+                        context,
+                        source_object,
+                        object_name,
+                        False,
+                        False
+                    )
                 cf.set_active_object(context, dummy_object)
 
             else:

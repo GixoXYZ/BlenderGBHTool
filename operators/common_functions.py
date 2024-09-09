@@ -9,7 +9,7 @@ HAIR_NUM = "Number of converted hair"
 IMPORT_FAIL = "Failed to import, selected item is no longer available."
 
 
-def _link_to_scene(item_name, data_block, scene):
+def link_to_scene(item_name, data_block, scene):
     new_item = bpy.data.objects.new(item_name, data_block)
     scene.collection.objects.link(new_item)
     return new_item
@@ -222,32 +222,38 @@ def create_mesh_object(self, context, object_name):
         bpy.data.objects.remove(existing_object, do_unlink=True)
 
     mesh_block = bpy.data.meshes.new(object_name)
-    return _link_to_scene(object_name, mesh_block, context.scene)
+    return link_to_scene(object_name, mesh_block, context.scene)
 
 
-def convert_object(context, obj, target):
+def convert_object(context, obj, target, keep_original=False):
     """Convert object based on given type"""
     set_active_object(context, obj)
-    bpy.ops.object.convert(target=target)
+    bpy.ops.object.convert(target=target, keep_original=keep_original)
 
 
-def duplicate_item(context, source_item, duplicate_name, apply_transform):
+def duplicate_item(context, source_item, duplicate_name, apply_transform=False,
+                   clear_modifiers=False, restore_active_object=True, linked=False):
     """Duplicate object using its data block"""
 
     initial_active_object = context.object
     set_active_object(context, source_item)
-    bpy.ops.object.duplicate()
+    bpy.ops.object.duplicate(linked=linked)
 
     item_duple = context.object
     item_duple.name = duplicate_name
     item_duple.data.name = duplicate_name
+    if clear_modifiers:
+        clear_object_modifiers(item_duple)
     if apply_transform:
         bpy.ops.object.transform_apply(
             location=True,
             rotation=True,
             scale=True
         )
-    set_active_object(context, initial_active_object)
+    if restore_active_object:
+        set_active_object(context, initial_active_object)
+    else:
+        set_active_object(context, item_duple)
     return item_duple
 
 
@@ -255,10 +261,7 @@ def copy_modifiers(context, source_object, target_object, clear_existing_modifie
     """Copy modifiers from given source to target object"""
     if source_object and target_object:
         if clear_existing_modifiers:
-            mods = target_object.modifiers
-            for mod in mods:
-                target_object.modifiers.remove(mod)
-
+            clear_object_modifiers(target_object)
         select_objects(
             context,
             objects=target_object,
@@ -268,6 +271,12 @@ def copy_modifiers(context, source_object, target_object, clear_existing_modifie
         # Copy modifiers from source to target objects.
         with context.temp_override(selected_objects=source_object):
             bpy.ops.object.make_links_data(type="MODIFIERS")
+
+
+def clear_object_modifiers(obj):
+    mods = obj.modifiers
+    for mod in mods:
+        obj.modifiers.remove(mod)
 
 
 def set_object_location(obj, location):
@@ -352,11 +361,15 @@ def create_new_item(context, scene, item_name, item_type):
     """Create new data block and add it to a new object and given scene"""
     if item_type == "CURVE":
         data_block = bpy.data.curves.new(item_name, "CURVE")
-        return _link_to_scene(item_name, data_block, scene)
+        return link_to_scene(item_name, data_block, scene)
 
     if item_type == "CURVES":
         data_block = bpy.data.hair_curves.new(item_name)
-        return _link_to_scene(item_name, data_block, scene)
+        return link_to_scene(item_name, data_block, scene)
+
+    if item_type == "ARMATURE":
+        data_block = bpy.data.armatures.new(item_name)
+        return link_to_scene(item_name, data_block, scene)
 
     if item_type == "SCENE":
         bpy.ops.scene.new(type="NEW")
@@ -366,11 +379,11 @@ def create_new_item(context, scene, item_name, item_type):
 
     if item_type == "SUN_LIGHT":
         data_block = bpy.data.lights.new(name=item_name, type="SUN")
-        return _link_to_scene(item_name, data_block, scene)
+        return link_to_scene(item_name, data_block, scene)
 
     if item_type == "CAMERA":
         data_block = bpy.data.cameras.new(name=item_name)
-        return _link_to_scene(item_name, data_block, scene)
+        return link_to_scene(item_name, data_block, scene)
 
     if item_type == "WORLD":
         world = bpy.data.worlds.new(item_name)

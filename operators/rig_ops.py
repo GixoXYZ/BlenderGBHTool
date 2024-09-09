@@ -163,6 +163,9 @@ class GBH_OT_hair_to_armature(Operator):
         gbh_rig = wm.gbh_rig
         hair_object = scene.hair_object
 
+        # Make sure the hair object is not hidden.
+        context.scene["hair_object"].hide_set(False)
+
         convert_ng = "RigMaker"
         dummy_name = f"{hair_object.name}_ArmMesh"
         duple_name = f"{scene.hair_object.name}_Duple"
@@ -171,7 +174,6 @@ class GBH_OT_hair_to_armature(Operator):
 
         location = hair_object.matrix_world.translation
         rotation = hair_object.rotation_euler
-        scale = (hair_object.scale * hair_object.parent.scale)
 
         scale = hair_object.scale
         # Check if rig maker node group doesn't already exist in file.
@@ -185,7 +187,7 @@ class GBH_OT_hair_to_armature(Operator):
         cf.set_object_rotation(dummy_mesh, rotation)
         cf.set_object_scale(dummy_mesh, scale)
 
-        hair_duple = cf.duplicate_item(context, hair_object, duple_name, False)
+        hair_duple = cf.duplicate_item(context, hair_object, duple_name, False, True)
 
         if gbh_rig.arm_use_mods:
             _use_mods(context, hair_object, hair_duple)
@@ -258,15 +260,17 @@ class GBH_OT_automatic_weight_paint(Operator):
         wm = context.window_manager
         gbh_rig = wm.gbh_rig
 
+        # Switch to object mode.
         if context.active_object:
             bpy.ops.object.mode_set(mode="OBJECT")
-
+        # Make sure the hair object is not hidden.
         context.scene["hair_object"].hide_set(False)
 
         org_hair_object = scene.hair_object
         org_parent_bone = gbh_rig.arm_add_parent_bone
         gbh_rig.arm_add_parent_bone = "NONE"
 
+        # Check if the hair object has a mesh.
         try:
             bpy.ops.gbh.convert_hair(convert_to="MESH")
             test_mesh = context.object
@@ -278,25 +282,13 @@ class GBH_OT_automatic_weight_paint(Operator):
 
             return {"CANCELLED"}
 
-        cf.set_active_object(context, scene.hair_object)
-        bpy.ops.object.duplicate(linked=False)
-        dummy_hair_obj = scene.hair_object = context.object
-
-        bpy.ops.gbh.delete_all_mods()
-
-        bpy.ops.gbh.convert_hair(convert_to="CURVE")
-        cf.delete_item(dummy_hair_obj.data)
-
-        dummy_obj = context.object
-
-        if gbh_rig.arm_use_mods and not gbh_rig.wp_fix_duplicated_mesh_switch:
-            _use_mods(context, org_hair_object, dummy_obj)
-            cf.set_active_object(context, dummy_obj)
-            bpy.ops.object.convert(target="MESH")
-            bpy.ops.object.convert(target="CURVE")
+        # Duplicate hair object and convert it to curve.
+        dummy_hair_obj = cf.duplicate_item(context, scene.hair_object, "hair_dummy", False, True, False)
+        cf.convert_object(context, dummy_hair_obj, "MESH")
+        cf.convert_object(context, dummy_hair_obj, "CURVE")
 
         objs = []
-        for _ in dummy_obj.data.splines:
+        for _ in dummy_hair_obj.data.splines:
             bpy.ops.object.duplicate(linked=False)
             objs.append(context.object)
 
@@ -312,13 +304,9 @@ class GBH_OT_automatic_weight_paint(Operator):
             vector3_co = Vector((point_co.x, point_co.y, point_co.z))
             objs_roots.append(vector3_co)
 
-            if gbh_rig.arm_use_mods and gbh_rig.wp_fix_duplicated_mesh_switch:
-                _use_mods(context, org_hair_object, obj)
-                cf.set_active_object(context, obj)
-
             bpy.ops.gbh.hair_to_armature()
 
-        cf.delete_item(dummy_obj.data)
+        cf.delete_item(dummy_hair_obj.data)
 
         mesh_objs = []
         arm_objs = []

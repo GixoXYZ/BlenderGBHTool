@@ -4,7 +4,7 @@ import bpy
 from bpy.types import Panel
 
 from ..global_variables import GBH_PACKAGE
-from . common_ui import GBHBasePanel, box_sub_panel, clear_pointer_if_object_deleted
+from . common_ui import GBHBasePanel, box_sub_panel, clear_pointer_if_object_deleted, multi_line_text
 
 
 class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
@@ -154,7 +154,7 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
         scene = context.scene
         wm = context.window_manager
         gbh_rig = wm.gbh_rig
-        title = "Weight Paint"
+        title = "Weight Paint (Experimental)"
         sub_panel = box_sub_panel(
             layout,
             "WPAINT_HLT",
@@ -168,6 +168,13 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
             if not scene.hair_object:
                 row = body.row()
                 row.label(text="Please select a hair object.", icon="INFO")
+                return
+
+            if gbh_rig.arm_use_mods:
+                col = body.column()
+                col.label(text="Automatic weight paint not possible.", icon="INFO")
+                text = 'Please turn off "Use Hair Object\'s Modifiers" in the "Armature Creation" section. '
+                multi_line_text(context, text, col)
                 return
 
             armature_name = f"{scene.hair_object.name}_Armature"
@@ -237,11 +244,6 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
 
             box = body.box()
             col = box.column()
-            if gbh_rig.arm_use_mods:
-                col.prop(
-                    gbh_rig,
-                    "wp_fix_duplicated_mesh_switch",
-                )
             col.operator("gbh.automatic_weight_paint")
 
 
