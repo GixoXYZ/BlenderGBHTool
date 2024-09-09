@@ -253,6 +253,30 @@ class GBH_RigProperties(PropertyGroup):
         ],
         update=_arm_update,
     )
+    arm_bbone_segments: IntProperty(
+        name="B-Bone Segments",
+        description="Number of subdivisions of bone (for B-Bones only)",
+        min=1,
+        soft_max=10,
+        default=5,
+        update=_arm_update,
+    )
+    arm_bbone_x: FloatProperty(
+        name="B-Bone Display X Width",
+        description="B-Bone X size",
+        min=0,
+        soft_max=0.1,
+        default=0.01,
+        update=_arm_update,
+    )
+    arm_bbone_z: FloatProperty(
+        name="B-Bone Display Z Width",
+        description="B-Bone Z size",
+        min=0,
+        soft_max=0.1,
+        default=0.01,
+        update=_arm_update,
+    )
     arm_name_chain: StringProperty(
         name="Chain Name",
         default="Hair",

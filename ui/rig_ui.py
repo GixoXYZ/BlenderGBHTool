@@ -114,6 +114,11 @@ class VIEW3D_PT_rig_ui_main(Panel, GBHBasePanel):
             col = box.column()
             col.label(text="Displays Armature As")
             col.prop(gbh_rig, "arm_display_type", text="")
+            if gbh_rig.arm_display_type == "BBONE":
+                col.prop(gbh_rig, "arm_bbone_segments")
+                col.label(text="Display Size")
+                col.prop(gbh_rig, "arm_bbone_x")
+                col.prop(gbh_rig, "arm_bbone_z")
 
             box = body.box()
             col = box.column()

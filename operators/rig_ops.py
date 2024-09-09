@@ -94,6 +94,11 @@ def _apply_skin_modifier(context, new_object, armature_name):
     context.object.name = armature_name
     context.object.data.name = armature_name
     context.object.data.display_type = gbh_rig.arm_display_type
+    if gbh_rig.arm_display_type == "BBONE":
+        for bone in context.object.data.bones:
+            bone.bbone_segments = gbh_rig.arm_bbone_segments
+            bone.bbone_x = gbh_rig.arm_bbone_x
+            bone.bbone_z = gbh_rig.arm_bbone_z
 
 
 def _clean_up(dummy_mesh, convert_ng, hair_duple):
