@@ -19,10 +19,6 @@ def _update_icons(self, context):
     load_icons()
 
 
-def _update_channel(self, context):
-    self.update_available = False
-
-
 def _lib_item_per_page_update(self, context):
     wm = context.window_manager
     gbh_lib = wm.gbh_lib
@@ -46,10 +42,6 @@ class GBHPreferences(AddonPreferences):
     last_update_check: StringProperty(default="Never")
     update_available: BoolProperty(
         default=False,
-    )
-    preview_update: BoolProperty(
-        name="Include Preview Updates",
-        default=True,
     )
     update_check_interval: EnumProperty(
         name="Update Check Interval",
@@ -363,8 +355,9 @@ class GBHPreferences(AddonPreferences):
         layout = self.layout
         wm = bpy.context.window_manager
         gbh_update = wm.gbh_update
-
-        box = layout.box()
+        
+        update_section = layout.column(align=True)
+        box = update_section.box()
         col = box.column()
         col.label(text="Add-on Updates:")
         row = col.row()
@@ -384,7 +377,7 @@ class GBHPreferences(AddonPreferences):
                 "wm.url_open",
                 icon="IMPORT",
                 text=f"Download GBH Tool {self.update_latest_version}"
-            ).url = gv.update_url
+            ).url = gv.ULR_UPDATE
 
             sub_row = update_button.row()
             sub_row.scale_x = 0.6
@@ -392,12 +385,11 @@ class GBHPreferences(AddonPreferences):
                 "wm.url_open",
                 icon="INFO",
                 text="Changelog"
-            ).url = gv.update_info_url
+            ).url = gv.ULR_UPDATE_INFO
 
         else:
             update_button.operator("gbh.update_check", icon="FILE_REFRESH")
 
-        row.prop(self, "preview_update")
         row = col.row()
         row.prop(self, "automatic_update_check")
         row = row.row()
@@ -405,9 +397,35 @@ class GBHPreferences(AddonPreferences):
         row.prop(self, "update_check_interval", text="")
 
         row = col.row()
-        row.label(text=f"Lase Update Check: {self.last_update_check}")
+        row.label(text=f"Last Update Check: {self.last_update_check}")
         col = col.column()
         col.label(text=f"Last Update Check Report: {gbh_update.update_report}")
+
+        box = update_section.box()
+        col = box.column()
+        col.label(text="Get Preview Builds:")
+        col = box.column()
+        row = col.row()
+        row.label(text="GBH Tool Update Branches")
+        row.prop(gbh_update, "update_branches", text="")
+        col.label(text=f"Latest Commit: {gbh_update.update_latest_commit}")
+        if gbh_update.update_branches != "NA":
+            update_url = f"{gv.URL_GITHUB}/archive/refs/heads/{gbh_update.update_branches}.zip"
+            col.operator(
+                "wm.url_open",
+                icon="IMPORT",
+                text=f'Download Latest Build from "{gbh_update.update_branches}" Branch'
+            ).url = update_url
+            col.label(
+                text="Installing preview builds will most likely break your Blender installation, so please use them with caution!",
+                icon="ERROR")
+            col.label(text="Remove the current GBH Tool installation before proceeding.", icon="ERROR")
+            col.label(text="Make a backup of Blender's data folder before proceeding!", icon="ERROR")
+            col.operator(
+                "gbh.open_folder",
+                text="Open Blender's Data Folder",
+                icon="TOOL_SETTINGS"
+            ).path = gv.DIR_BLENDER_DATA_FOLDER
 
         box = layout.box()
         col = box.column()
@@ -423,7 +441,9 @@ class GBHPreferences(AddonPreferences):
         for panel in panels:
             col.prop(self, panel)
 
+        box = layout.box()
         col = box.column()
+        col.label(text="Shortcuts:")
         col.label(text="Panel Toggle Pie Menu Shortcut:")
         row = col.row()
         row.prop(self, "shortcut_panel_key")

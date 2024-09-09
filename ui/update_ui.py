@@ -33,12 +33,12 @@ class VIEW3D_PT_update_ui_main(Panel, GBHBasePanel):
             "wm.url_open",
             icon="IMPORT",
             text=f"Download GBH Tool {pref.update_latest_version}"
-        ).url = gv.update_url
+        ).url = gv.ULR_UPDATE
         col.operator(
             "wm.url_open",
             icon="INFO",
             text="Changelog"
-        ).url = gv.update_info_url
+        ).url = gv.ULR_UPDATE_INFO
 
 
 classes = (

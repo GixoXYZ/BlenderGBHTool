@@ -12,6 +12,7 @@ from bpy.props import (
     CollectionProperty,
 )
 
+from . import global_variables as gv
 from . operators.hair_card_ops import rename_renders
 from . operators.presets_ops import refresh_presets_list
 from . operators import library_ops as lib_ops
@@ -129,6 +130,23 @@ def _particle_parent_object_poll(self, obj):
     valid_obj_type = ["MESH"]
     if obj.type in valid_obj_type and obj in list(bpy.context.scene.objects):
         return obj.type
+
+
+"""Update Checker functions"""
+
+
+def _get_update_branches(self, context):
+    return gv.branches_cache
+
+
+def _latest_commit_date_update(self, context):
+    wm = context.window_manager
+    gbh_update = wm.gbh_update
+
+    if gv.branches_latest_commits.get(gbh_update.update_branches):
+        gbh_update.update_latest_commit = gv.branches_latest_commits[gbh_update.update_branches]
+    else:
+        gbh_update.update_latest_commit = "Not Available"
 
 
 """
@@ -565,6 +583,15 @@ class GBH_UpdateProperties(PropertyGroup):
     """Update property group"""
     update_report: StringProperty(
         default="No update check has been done yet in this session"
+    )
+    update_branches: EnumProperty(
+        name="GBH Tool Update Branches",
+        description="List of update branches in GBH Tool repository",
+        items=_get_update_branches,
+        update=_latest_commit_date_update,
+    )
+    update_latest_commit: StringProperty(
+        default="Not Available",
     )
 
 
