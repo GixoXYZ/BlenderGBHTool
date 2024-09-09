@@ -226,7 +226,7 @@ class GBH_OT_hair_to_armature(Operator):
             _apply_skin_modifier(context, dummy_mesh, armature_name)
             _rename_bones(scene, context, armature_name)
             if gbh_rig.arm_add_parent_bone == "BONE":
-                parent_size = gbh_rig.arm_parent_size / 100
+                parent_size = gbh_rig.arm_parent_size
                 _add_parent_bone(scene, context, armature_name, parent_size)
 
             elif gbh_rig.arm_add_parent_bone == "ARM":
@@ -347,7 +347,7 @@ class GBH_OT_automatic_weight_paint(Operator):
                 for vertex in mesh.data.vertices:
                     root_co = objs_roots[mesh_index]
                     distance = (vertex.co - root_co).length
-                    if distance <= (gbh_rig.wp_clear_from_roots_distance / 100):
+                    if distance <= (gbh_rig.wp_clear_from_roots_distance):
                         # Iterate through the vertices and clear weight paint.
                         for group in mesh.vertex_groups:
                             group.remove([vertex.index])
@@ -396,7 +396,7 @@ class GBH_OT_automatic_weight_paint(Operator):
         context.object.data.name = mesh_name
 
         if gbh_rig.arm_add_parent_bone == "BONE":
-            parent_size = gbh_rig.arm_parent_size / 100
+            parent_size = gbh_rig.arm_parent_size
             _add_parent_bone(scene, context, armature_name, parent_size)
 
         elif gbh_rig.arm_add_parent_bone == "ARM":

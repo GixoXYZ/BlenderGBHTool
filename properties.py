@@ -335,11 +335,12 @@ class GBH_RigProperties(PropertyGroup):
         update=_arm_update,
     )
     arm_parent_size: FloatProperty(
-        name="Armature Parent Bone Size (cm)",
+        name="Armature Parent Bone Size",
         description="Size of added parent bone to the armature",
-        min=5,
-        max=100,
-        default=25,
+        min=0.05,
+        max=1,
+        default=0.25,
+        unit="LENGTH",
         update=_arm_update,
     )
     arm_reverse: BoolProperty(
@@ -388,10 +389,11 @@ class GBH_RigProperties(PropertyGroup):
         default=True,
     )
     wp_clear_from_roots_distance: FloatProperty(
-        name="Distance from Root (cm)",
-        default=2.5,
-        soft_max=100,
+        name="Distance from Root",
+        default=0.025,
+        soft_max=1,
         min=0,
+        unit="LENGTH"
     )
     wp_tweak_levels_switch: BoolProperty(
         name="Tweak Levels",
