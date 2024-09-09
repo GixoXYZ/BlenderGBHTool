@@ -38,6 +38,11 @@ class GBHPreferences(AddonPreferences):
         name="Automatic Update Check",
         default=True,
     )
+    presets_place_at_cursor_location: BoolProperty(
+        name="Place at Cursor Location",
+        default=False,
+
+    )
     update_latest_version: StringProperty()
     last_update_check: StringProperty(default="Never")
     update_available: BoolProperty(
@@ -355,7 +360,7 @@ class GBHPreferences(AddonPreferences):
         layout = self.layout
         wm = bpy.context.window_manager
         gbh_update = wm.gbh_update
-        
+
         update_section = layout.column(align=True)
         box = update_section.box()
         col = box.column()

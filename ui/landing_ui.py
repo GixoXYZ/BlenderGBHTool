@@ -2,7 +2,7 @@
 
 from bpy.types import Panel, UIList
 
-from ..global_variables import LIST_ROWS
+from .. import global_variables as gv
 from . common_ui import GBHBasePanel, box_sub_panel, clear_pointer_if_object_deleted
 
 
@@ -71,6 +71,7 @@ class VIEW3D_PT_landing_ui_main(Panel, GBHBasePanel):
         scene = context.scene
         wm = context.window_manager
         gbh_presets = wm.gbh_presets
+        pref = context.preferences.addons[gv.GBH_PACKAGE].preferences
 
         col = layout.column()
         col.prop(gbh_presets, "presets_hair_type", text="")
@@ -85,7 +86,7 @@ class VIEW3D_PT_landing_ui_main(Panel, GBHBasePanel):
                 "gbh_presets_list",
                 gbh_presets,
                 "presets_list_index",
-                rows=LIST_ROWS
+                rows=gv.LIST_ROWS
             )
 
             box = col.box()
@@ -111,17 +112,17 @@ class VIEW3D_PT_landing_ui_main(Panel, GBHBasePanel):
             row.operator("gbh.save_preset", text="", icon="ADD")
 
             col = box.column()
-            col.scale_y = 1.5
 
-            presets_list = wm.get("gbh_presets_list")
-
-            if presets_list:
+            if presets_list := wm.get("gbh_presets_list"):
                 if gbh_presets.presets_hair_type == "OBJECT":
                     text = "Import Hair Object to File"
+                    col.prop(pref, "presets_place_at_cursor_location")
 
                 else:
                     text = "Apply Selected Preset to the Hair Object"
 
+                col = box.column()
+                col.scale_y = 1.5
                 col.operator("gbh.load_preset", text=text)
 
         else:

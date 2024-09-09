@@ -5,7 +5,7 @@ import os
 from bpy.types import Operator
 
 from . import common_functions as cf
-from ..global_variables import DIR_PRESETS
+from .. import global_variables as gv
 
 MAX_PRESET = 150
 
@@ -19,7 +19,7 @@ def _get_path(context):
         bpy.ops.object.mode_set(mode="OBJECT")
 
     # Get presets path.
-    path = os.path.join(DIR_PRESETS, f"{gbh_presets.presets_hair_type}/")
+    path = os.path.join(gv.DIR_PRESETS, f"{gbh_presets.presets_hair_type}/")
     return path
 
 
@@ -183,6 +183,7 @@ class GBH_OT_load_preset(Operator):
         wm = context.window_manager
         gbh_presets = wm.gbh_presets
         presets_list = wm.get("gbh_presets_list")
+        pref = context.preferences.addons[gv.GBH_PACKAGE].preferences
 
         # Check if presets list is not empty.
         file_name = _get_preset_file_name()
@@ -193,8 +194,16 @@ class GBH_OT_load_preset(Operator):
         if gbh_presets.presets_hair_type != "OBJECT":
             cf.copy_modifiers(context, obj, scene.hair_object, True)
             cf.delete_item(obj.data)
+            active_object = scene.hair_object
 
-        cf.set_active_object(context, scene.hair_object)
+        elif pref.presets_place_at_cursor_location:
+            obj.location = bpy.context.scene.cursor.location
+            active_object = obj
+
+        else:
+            active_object = obj
+
+        cf.set_active_object(context, active_object)
 
         return {"FINISHED"}
 
