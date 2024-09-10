@@ -1,9 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import bpy
-import os
+from bpy.props import StringProperty
 from bpy.types import Operator
+import os
+import re
 from mathutils import Vector
+
 
 from ..global_variables import DIR_ASSETS, PRE_MADE_NODES_FILE
 from . import common_functions as cf
@@ -419,30 +422,68 @@ class GBH_OT_select_similar_bones(Operator):
     bl_idname = "gbh.select_similar_bones"
     bl_label = "Select Similar Bones"
     bl_description = "Automatically select similar bones"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = {"UNDO"}
+
+    select_mode: StringProperty()
 
     # TODO: Add select by in-chain location.
     def execute(self, context):
-        wm = context.window_manager
-        gbh_rig = wm.gbh_rig
-
         mode = context.mode
+        bone_name = (
+            context.object.parent.data.bones.active.name
+            if mode == "PAINT_WEIGHT"
+            else context.object.data.bones.active.name
+        )
 
-        if mode == "PAINT_WEIGHT":
-            bone_name = context.object.parent.data.bones.active.name
-            name_pattern = bone_name.split(gbh_rig.arm_name_bone)[-1]
-            armature_obj = context.object.parent
-            armature_obj_data = armature_obj.data
+        name_pattern = self.get_name_pattern(self.select_mode, bone_name)
 
-            for bone in armature_obj_data.bones:
-                bone.select = bool(bone.name.endswith(name_pattern))
-        else:
-            bone_name = context.object.data.bones.active.name
-            name_pattern = bone_name.split(gbh_rig.arm_name_bone)[-1]
-            bpy.ops.pose.select_all(action="DESELECT")
-            bpy.ops.object.select_pattern(pattern=f"*{name_pattern}")
+        if self.select_mode in {"ENDING_DIGITS", "ENDING_LETTERS"}:
+            self.select_ending_pattern(context, name_pattern, mode)
+        elif self.select_mode == "STARTING_LETTERS":
+            self.select_starting_pattern(context, name_pattern, mode)
 
         return {"FINISHED"}
+
+    def get_name_pattern(self, select_mode, bone_name):
+        if select_mode == "ENDING_DIGITS":
+            match = re.search(r"\d+$", bone_name)
+            return match.group() if match else bone_name
+
+        if select_mode == "ENDING_LETTERS":
+            match = re.findall(r"[A-Za-z]+", bone_name)
+            if len(match) > 1:
+                return match[-1]
+            match = re.findall(r"[A-Z][a-z]*", bone_name)
+            if len(match) > 1:
+                return match[-1]
+
+        if select_mode == "STARTING_LETTERS":
+            match = re.findall(r"[A-Za-z]+", bone_name)
+            if len(match) > 1:
+                return match[0]
+            match = re.findall(r"[A-Z][a-z]*", bone_name)
+            if len(match) > 1:
+                return match[0]
+
+        return bone_name
+
+    def select_starting_pattern(self, context, name_pattern, mode):
+        if mode == "PAINT_WEIGHT":
+            armature_obj = context.object.parent
+            for bone in armature_obj.data.bones:
+                bone.select = bone.name.startswith(name_pattern)
+        else:
+            bpy.ops.pose.select_all(action="DESELECT")
+            bpy.ops.object.select_pattern(pattern=f"{name_pattern}*")
+
+    def select_ending_pattern(self, context, name_pattern, mode):
+        if mode == "PAINT_WEIGHT":
+            armature_obj = context.object.parent
+            for bone in armature_obj.data.bones:
+                bone.select = bone.name.endswith(name_pattern)
+        else:
+            bpy.ops.pose.select_all(action="DESELECT")
+            bpy.ops.object.select_pattern(pattern=f"*{name_pattern}")
 
 
 class GBH_OT_select_all_bones(Operator):

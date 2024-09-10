@@ -68,10 +68,21 @@ class VIEW3D_MT_PIE_gbh_rig(Menu):
 
         section_selection = pie.column()
         box = section_selection.box()
-        box.label(text="Selection")
+        box.label(text="Bone Selection")
         col = box.column()
         col.scale_y = 1.3
-        col.operator("gbh.select_similar_bones", text="Select Similar Bones by Name")
+        col.operator(
+            "gbh.select_similar_bones",
+            text="Select Similar by Ending Digits"
+        ).select_mode = "ENDING_DIGITS"
+        col.operator(
+            "gbh.select_similar_bones",
+            text="Select Similar by Ending Letters"
+        ).select_mode = "ENDING_LETTERS"
+        col.operator(
+            "gbh.select_similar_bones",
+            text="Select Similar by Starting Letters"
+        ).select_mode = "STARTING_LETTERS"
         col.operator("gbh.select_all_bones")
 
         try:
