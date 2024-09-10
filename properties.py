@@ -259,6 +259,10 @@ class GBH_RigProperties(PropertyGroup):
         name="Minimize/Maximize Armature Creation",
         default=True,
     )
+    rig_keep_previous_selection: BoolProperty(
+        name="Keep Previous Selection",
+        default=False,
+    )
     arm_display_type: EnumProperty(
         name="Display Armature As",
         description="Change bones display type in the 3d viewport.",

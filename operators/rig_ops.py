@@ -426,23 +426,39 @@ class GBH_OT_select_similar_bones(Operator):
 
     select_mode: StringProperty()
 
-    # TODO: Add select by in-chain location.
     def execute(self, context):
+        wm = context.window_manager
+        gbh_rig = wm.gbh_rig
+
         mode = context.mode
-        bone_name = (
-            context.object.parent.data.bones.active.name
-            if mode == "PAINT_WEIGHT"
-            else context.object.data.bones.active.name
+        bones = context.object.parent.data.bones if mode == "PAINT_WEIGHT" else context.object.data.bones
+        active_bone = (
+            context.object.parent.data.bones.active if mode == "PAINT_WEIGHT" else context.object.data.bones.active
         )
 
-        name_pattern = self.get_name_pattern(self.select_mode, bone_name)
+        # Deselect previous selection if the option is not enabled
+        if not gbh_rig.rig_keep_previous_selection:
+            self.deselect_all_bones(active_bone, bones)
 
-        if self.select_mode in {"ENDING_DIGITS", "ENDING_LETTERS"}:
-            self.select_ending_pattern(context, name_pattern, mode)
-        elif self.select_mode == "STARTING_LETTERS":
-            self.select_starting_pattern(context, name_pattern, mode)
+        if self.select_mode == "CHAIN_INDEX":
+            bone_index_in_chain = len(active_bone.parent_recursive)
+            self.select_chain_by_index(bone_index_in_chain, bones)
+
+        else:
+            bone_name = active_bone.name
+            name_pattern = self.get_name_pattern(self.select_mode, bone_name)
+            if self.select_mode in {"ENDING_DIGITS", "ENDING_LETTERS"}:
+                self.select_ending_pattern(name_pattern, bones)
+
+            elif self.select_mode == "STARTING_LETTERS":
+                self.select_starting_pattern(name_pattern, bones)
 
         return {"FINISHED"}
+
+    def deselect_all_bones(self, active_bone, bones):
+        for bone in bones:
+            bone.select = False
+        active_bone.select = True
 
     def get_name_pattern(self, select_mode, bone_name):
         if select_mode == "ENDING_DIGITS":
@@ -451,39 +467,28 @@ class GBH_OT_select_similar_bones(Operator):
 
         if select_mode == "ENDING_LETTERS":
             match = re.findall(r"[A-Za-z]+", bone_name)
-            if len(match) > 1:
-                return match[-1]
-            match = re.findall(r"[A-Z][a-z]*", bone_name)
-            if len(match) > 1:
-                return match[-1]
+            return match[-1] if len(match) > 1 else bone_name
 
         if select_mode == "STARTING_LETTERS":
             match = re.findall(r"[A-Za-z]+", bone_name)
-            if len(match) > 1:
-                return match[0]
-            match = re.findall(r"[A-Z][a-z]*", bone_name)
-            if len(match) > 1:
-                return match[0]
+            return match[0] if len(match) > 1 else bone_name
 
         return bone_name
 
-    def select_starting_pattern(self, context, name_pattern, mode):
-        if mode == "PAINT_WEIGHT":
-            armature_obj = context.object.parent
-            for bone in armature_obj.data.bones:
-                bone.select = bone.name.startswith(name_pattern)
-        else:
-            bpy.ops.pose.select_all(action="DESELECT")
-            bpy.ops.object.select_pattern(pattern=f"{name_pattern}*")
+    def select_chain_by_index(self, bone_index_in_chain, bones):
+        for bone in bones:
+            if len(bone.parent_recursive) == bone_index_in_chain:
+                bone.select = True
 
-    def select_ending_pattern(self, context, name_pattern, mode):
-        if mode == "PAINT_WEIGHT":
-            armature_obj = context.object.parent
-            for bone in armature_obj.data.bones:
-                bone.select = bone.name.endswith(name_pattern)
-        else:
-            bpy.ops.pose.select_all(action="DESELECT")
-            bpy.ops.object.select_pattern(pattern=f"*{name_pattern}")
+    def select_starting_pattern(self, name_pattern, bones):
+        for bone in bones:
+            if bone.name.startswith(name_pattern):
+                bone.select = True
+
+    def select_ending_pattern(self, name_pattern, bones):
+        for bone in bones:
+            if bone.name.endswith(name_pattern):
+                bone.select = True
 
 
 class GBH_OT_select_all_bones(Operator):

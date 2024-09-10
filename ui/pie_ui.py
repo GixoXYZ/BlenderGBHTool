@@ -54,6 +54,9 @@ class VIEW3D_MT_PIE_gbh_rig(Menu):
 
     # TODO: Test rig pie menu in different scenarios.
     def draw(self, context):
+        wm = context.window_manager
+        gbh_rig = wm.gbh_rig
+
         layout = self.layout
         pie = layout.menu_pie()
 
@@ -73,6 +76,10 @@ class VIEW3D_MT_PIE_gbh_rig(Menu):
         col.scale_y = 1.3
         col.operator(
             "gbh.select_similar_bones",
+            text="Select Similar by Chain Index"
+        ).select_mode = "CHAIN_INDEX"
+        col.operator(
+            "gbh.select_similar_bones",
             text="Select Similar by Ending Digits"
         ).select_mode = "ENDING_DIGITS"
         col.operator(
@@ -84,6 +91,8 @@ class VIEW3D_MT_PIE_gbh_rig(Menu):
             text="Select Similar by Starting Letters"
         ).select_mode = "STARTING_LETTERS"
         col.operator("gbh.select_all_bones")
+
+        col.prop(gbh_rig, "rig_keep_previous_selection")
 
         try:
             quantize.group_select_mode = "BONE_SELECT"
