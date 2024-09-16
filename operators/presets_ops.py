@@ -5,7 +5,7 @@ import os
 from bpy.types import Operator
 
 from . import common_functions as cf
-from .. constants import DIR_PRESETS
+from .. import global_variables as gv
 
 MAX_PRESET = 150
 
@@ -18,8 +18,8 @@ def _get_path(context):
     if context.active_object:
         bpy.ops.object.mode_set(mode="OBJECT")
 
-    # Get presets path
-    path = os.path.join(DIR_PRESETS, f"{gbh_presets.presets_hair_type}/")
+    # Get presets path.
+    path = os.path.join(gv.DIR_PRESETS, f"{gbh_presets.presets_hair_type}/")
     return path
 
 
@@ -42,7 +42,7 @@ def _get_preset_file_name():
 
 def _get_preset_file_loc(context, file_name):
     path = _get_path(context)
-    return path+file_name+".blend"
+    return path + file_name + ".blend"
 
 
 def refresh_presets_list(self, context):
@@ -69,7 +69,7 @@ def refresh_presets_list(self, context):
             preset.name = blend_file
 
     except FileNotFoundError as err:
-        print(err)
+        print(f"GBH Tool: {err}")
         err = f"Error: presets/{gbh_presets.presets_hair_type} directory has been moved or removed. Recreate directory or reinstall add-on."
         self.report({"ERROR"}, err)
 
@@ -92,29 +92,27 @@ class GBH_OT_save_preset(Operator):
         gbh_presets = wm.gbh_presets
         object_name = gbh_presets.new_preset_name
         source_object = scene.hair_object
-        # Save preset if it doesn't already exists, the name is not blank and the list items count is under 100
+        # Save preset if it doesn't already exists, the name is not blank and the list items count is under 100.
         if object_name and object_name not in blend_files and len(blend_files) < 100:
-            presets_type = gbh_presets.presets_hair_type
             dif_name_than_hair = source_object.name != object_name
-            if dif_name_than_hair and presets_type != "OBJECT":
-                dummy_object = cf.create_new_item(
-                    context,
-                    scene,
-                    object_name,
-                    "CURVES"
-                )
-                cf.copy_modifiers(context, source_object, dummy_object, True)
-                cf.set_active_object(context, dummy_object)
-
-            elif dif_name_than_hair and presets_type == "OBJECT":
-                dummy_object = cf.duplicate_item(
-                    context,
-                    scene,
-                    source_object,
-                    object_name,
-                    False
-                )
-                cf.copy_modifiers(context, source_object, dummy_object, True)
+            if dif_name_than_hair:
+                presets_type = gbh_presets.presets_hair_type
+                if presets_type != "OBJECT":
+                    dummy_object = cf.create_new_item(
+                        context,
+                        scene,
+                        object_name,
+                        "CURVES"
+                    )
+                    cf.copy_modifiers(context, source_object, dummy_object, True)
+                else:
+                    dummy_object = cf.duplicate_item(
+                        context,
+                        source_object,
+                        object_name,
+                        False,
+                        False
+                    )
                 cf.set_active_object(context, dummy_object)
 
             else:
@@ -159,7 +157,7 @@ class GBH_OT_remove_preset(Operator):
             refresh_presets_list(self, context)
             gbh_presets = wm.gbh_presets
 
-            # Change presets list index when removing and object to avoid index out of range error
+            # Change presets list index when removing and object to avoid index out of range error.
             if gbh_presets.presets_list_index > 0:
                 gbh_presets.presets_list_index -= 1
 
@@ -167,7 +165,7 @@ class GBH_OT_remove_preset(Operator):
                 gbh_presets.presets_list_index -= 0
 
         except OSError as err:
-            print(err)
+            print(f"GBH Tool: {err}")
             err = "Preset is no longer available, refresh presets to update the list."
             self.report({"ERROR"}, err)
 
@@ -185,24 +183,27 @@ class GBH_OT_load_preset(Operator):
         wm = context.window_manager
         gbh_presets = wm.gbh_presets
         presets_list = wm.get("gbh_presets_list")
+        pref = context.preferences.addons[gv.GBH_PACKAGE].preferences
 
-        # If presets list is not empty
-        if presets_list:
-            file_name = _get_preset_file_name()
-            file_loc = _get_preset_file_loc(context, file_name)
-            object_path = file_loc
-            obj = cf.append_object(self, object_path, file_name)
+        # Check if presets list is not empty.
+        file_name = _get_preset_file_name()
+        file_loc = _get_preset_file_loc(context, file_name)
+        object_path = file_loc
+        obj = cf.append_object(self, object_path, file_name)
 
-            if gbh_presets.presets_hair_type != "OBJECT":
-                cf.copy_modifiers(context, obj, scene.hair_object, True)
-                cf.delete_item(obj.data)
+        if gbh_presets.presets_hair_type != "OBJECT":
+            cf.copy_modifiers(context, obj, scene.hair_object, True)
+            cf.delete_item(obj.data)
+            active_object = scene.hair_object
 
-            cf.set_active_object(context, scene.hair_object)
+        elif pref.presets_place_at_cursor_location:
+            obj.location = bpy.context.scene.cursor.location
+            active_object = obj
 
-        # If presets list is empty
-        elif not presets_list or len(presets_list) <= 0:
-            err = "Presets list is empty."
-            self.report({"ERROR"}, err)
+        else:
+            active_object = obj
+
+        cf.set_active_object(context, active_object)
 
         return {"FINISHED"}
 

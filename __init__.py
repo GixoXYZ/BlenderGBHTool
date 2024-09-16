@@ -1,24 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# A minor portion of this program includes code from Antti Tikka's Modifier List Blender add-on released in April 1, 2022.
+
+# A portion of this program includes code from Antti Tikka's Modifier List Blender add-on released in April 1, 2022.
 # Modifier List's code is used under the terms of the GNU General Public License v3.
 
+import toml
+import os
 
-# fmt: off
-bl_info = {
-    "name": "GBH Tool",
-    "author": "Gixo <notgixo@proton.me>",
-    "description": "Gixo's Blender Hair Tool generates different hair styles using Blender's new hair system.",
-    "blender": (3, 5, 0),
-    "version": (2, 1, 2, 1, "stable"),
-    "location": "View3D > Toolshelf > GBH Tool",
-    "warning": "",
-    "support": "COMMUNITY",
-    "category": "Object",
-    "doc_url": "https://notgixo.github.io/GBHToolDocs/",
-}
-
-from . operators.update_ops import addon_info
-# fmt: on
+from . import global_variables as gv
 
 if "bpy" in locals():
     import importlib
@@ -33,10 +21,9 @@ if "bpy" in locals():
     importlib.reload(presets_ops)
     importlib.reload(hair_card_ops)
     importlib.reload(ui_ops)
+    importlib.reload(info_ops)
     importlib.reload(update_ui)
-    importlib.reload(landing_ui_modules)
     importlib.reload(landing_ui)
-    importlib.reload(node_groups_ui_modules)
     importlib.reload(node_groups_ui)
     importlib.reload(library_ui)
     importlib.reload(hair_card_ui)
@@ -50,11 +37,9 @@ else:
     from .ui import (
         hair_card_ui,
         info_ui,
-        landing_ui_modules,
         landing_ui,
         library_ui,
         convert_ui,
-        node_groups_ui_modules,
         node_groups_ui,
         rig_ui,
         update_ui,
@@ -70,6 +55,7 @@ else:
         convert_ops,
         update_ops,
         ui_ops,
+        info_ops,
     )
     from . import (
         icons,
@@ -90,10 +76,9 @@ modules = [
     presets_ops,
     hair_card_ops,
     ui_ops,
+    info_ops,
     update_ui,
-    landing_ui_modules,
     landing_ui,
-    node_groups_ui_modules,
     node_groups_ui,
     library_ui,
     hair_card_ui,
@@ -106,11 +91,12 @@ modules = [
 
 
 def register():
-    version = tuple(
-        item for item in bl_info["version"] if not isinstance(item, str)
-    )
-    gbh_version = ".".join([str(x) for x in version])
-    addon_info(gbh_version)
+    script_dir = os.path.dirname(__file__)
+    file_path = os.path.join(script_dir, "blender_manifest.toml")
+    with open(file_path, "r") as file:
+        manifest_data = toml.load(file)
+        version = manifest_data["version"]
+        gv.GBH_VERSION = [int(part) for part in version.split('.')]
     for module in modules:
         module.register()
 

@@ -10,18 +10,13 @@ from bpy.props import (
     EnumProperty,
 )
 
-from . ui.common_ui import multi_line_text
 from . icons import load_icons
-from . import constants as const
+from . import global_variables as gv
 from . operators.ui_ops import add_hotkey, remove_hotkey
 
 
 def _update_icons(self, context):
     load_icons()
-
-
-def _update_channel(self, context):
-    self.update_available = False
 
 
 def _lib_item_per_page_update(self, context):
@@ -39,28 +34,29 @@ class GBHPreferences(AddonPreferences):
     bl_idname = __package__
     scriptdir = bpy.path.abspath(os.path.dirname(__file__))
 
-    startup_update_check: BoolProperty(
-        name="Check for Updates on Blender Startup (with 24 hrs intervals)",
+    automatic_update_check: BoolProperty(
+        name="Automatic Update Check",
+        default=True,
+    )
+    presets_place_at_cursor_location: BoolProperty(
+        name="Place at Cursor Location",
         default=False,
+
     )
-    update_latest_version: StringProperty(
-        default="85.85.85"
-    )
-    update_release_type: StringProperty()
-    update_blender_version: StringProperty()
-    update_message: StringProperty()
-    update_changelog: StringProperty(default="[]")
+    update_latest_version: StringProperty()
     last_update_check: StringProperty(default="Never")
     update_available: BoolProperty(
         default=False,
     )
-    update_channel:  EnumProperty(
-        name="Update Channel",
+    update_check_interval: EnumProperty(
+        name="Update Check Interval",
         items=[
-            ("gbh_tool_stable", "Stable", ""),
-            ("gbh_tool_latest", "Latest", ""),
+            ("24", "Daily", ""),
+            ("168", "Weekly", ""),
+            ("336", "Biweekly", ""),
+            ("720", "Monthly", ""),
         ],
-        update=_update_channel,
+        default="168"
     )
     panel_update_switch: BoolProperty(
         name="Update Panel Toggle",
@@ -114,7 +110,7 @@ class GBHPreferences(AddonPreferences):
     lib_add_to_active_object: BoolProperty(
         name="Add Node Groups to Active Object",
         description="Add node groups to active objects in viewport instead of adding them only to hair object",
-        default=True,
+        default=False,
     )
     icon_color: EnumProperty(
         items=[
@@ -136,202 +132,225 @@ class GBHPreferences(AddonPreferences):
         min=1,
         max=10,
     )
-    shortcut_key: EnumProperty(
-        items=(
-            ('NONE', "Select key", ""),
-            ("LEFTMOUSE", "LEFTMOUSE", ""),
-            ("MIDDLEMOUSE", "MIDDLEMOUSE", ""),
-            ("RIGHTMOUSE", "RIGHTMOUSE", ""),
-            ("BUTTON4MOUSE", "BUTTON4MOUSE", ""),
-            ("BUTTON5MOUSE", "BUTTON5MOUSE", ""),
-            ("BUTTON6MOUSE", "BUTTON6MOUSE", ""),
-            ("BUTTON7MOUSE", "BUTTON7MOUSE", ""),
-            ("MOUSEMOVE", "MOUSEMOVE", ""),
-            ("INBETWEEN_MOUSEMOVE", "INBETWEEN_MOUSEMOVE", ""),
-            ("TRACKPADPAN", "TRACKPADPAN", ""),
-            ("TRACKPADZOOM", "TRACKPADZOOM", ""),
-            ("MOUSEROTATE", "MOUSEROTATE", ""),
-            ("WHEELUPMOUSE", "WHEELUPMOUSE", ""),
-            ("WHEELDOWNMOUSE", "WHEELDOWNMOUSE", ""),
-            ("WHEELINMOUSE", "WHEELINMOUSE", ""),
-            ("WHEELOUTMOUSE", "WHEELOUTMOUSE", ""),
-            ("A", "A", ""),
-            ("B", "B", ""),
-            ("C", "C", ""),
-            ("D", "D", ""),
-            ("E", "E", ""),
-            ("F", "F", ""),
-            ("G", "G", ""),
-            ("H", "H", ""),
-            ("I", "I", ""),
-            ("J", "J", ""),
-            ("K", "K", ""),
-            ("L", "L", ""),
-            ("M", "M", ""),
-            ("N", "N", ""),
-            ("O", "O", ""),
-            ("P", "P", ""),
-            ("Q", "Q", ""),
-            ("R", "R", ""),
-            ("S", "S", ""),
-            ("T", "T", ""),
-            ("U", "U", ""),
-            ("V", "V", ""),
-            ("W", "W", ""),
-            ("X", "X", ""),
-            ("Y", "Y", ""),
-            ("Z", "Z", ""),
-            ("ZERO", "ZERO", ""),
-            ("ONE", "ONE", ""),
-            ("TWO", "TWO", ""),
-            ("THREE", "THREE", ""),
-            ("FOUR", "FOUR", ""),
-            ("FIVE", "FIVE", ""),
-            ("SIX", "SIX", ""),
-            ("SEVEN", "SEVEN", ""),
-            ("EIGHT", "EIGHT", ""),
-            ("NINE", "NINE", ""),
-            ("LEFT_CTRL", "LEFT_CTRL", ""),
-            ("LEFT_ALT", "LEFT_ALT", ""),
-            ("LEFT_SHIFT", "LEFT_SHIFT", ""),
-            ("RIGHT_ALT", "RIGHT_ALT", ""),
-            ("RIGHT_CTRL", "RIGHT_CTRL", ""),
-            ("RIGHT_SHIFT", "RIGHT_SHIFT", ""),
-            ("OSKEY", "OSKEY", ""),
-            ("GRLESS", "GRLESS", ""),
-            ("ESC", "ESC", ""),
-            ("TAB", "TAB", ""),
-            ("RET", "RET", ""),
-            ("SPACE", "SPACE", ""),
-            ("LINE_FEED", "LINE_FEED", ""),
-            ("BACK_SPACE", "BACK_SPACE", ""),
-            ("DEL", "DEL", ""),
-            ("SEMI_COLON", "SEMI_COLON", ""),
-            ("PERIOD", "PERIOD", ""),
-            ("COMMA", "COMMA", ""),
-            ("QUOTE", "QUOTE", ""),
-            ("ACCENT_GRAVE", "ACCENT_GRAVE", ""),
-            ("MINUS", "MINUS", ""),
-            ("SLASH", "SLASH", ""),
-            ("BACK_SLASH", "BACK_SLASH", ""),
-            ("EQUAL", "EQUAL", ""),
-            ("LEFT_BRACKET", "LEFT_BRACKET", ""),
-            ("RIGHT_BRACKET", "RIGHT_BRACKET", ""),
-            ("LEFT_ARROW", "LEFT_ARROW", ""),
-            ("DOWN_ARROW", "DOWN_ARROW", ""),
-            ("RIGHT_ARROW", "RIGHT_ARROW", ""),
-            ("UP_ARROW", "UP_ARROW", ""),
-            ("NUMPAD_1", "NUMPAD_1", ""),
-            ("NUMPAD_2", "NUMPAD_2", ""),
-            ("NUMPAD_3", "NUMPAD_3", ""),
-            ("NUMPAD_4", "NUMPAD_4", ""),
-            ("NUMPAD_5", "NUMPAD_5", ""),
-            ("NUMPAD_6", "NUMPAD_6", ""),
-            ("NUMPAD_7", "NUMPAD_7", ""),
-            ("NUMPAD_8", "NUMPAD_8", ""),
-            ("NUMPAD_9", "NUMPAD_9", ""),
-            ("NUMPAD_0", "NUMPAD_0", ""),
-            ("NUMPAD_PERIOD", "NUMPAD_PERIOD", ""),
-            ("NUMPAD_SLASH", "NUMPAD_SLASH", ""),
-            ("NUMPAD_ASTERIX", "NUMPAD_ASTERIX", ""),
-            ("NUMPAD_MINUS", "NUMPAD_MINUS", ""),
-            ("NUMPAD_ENTER", "NUMPAD_ENTER", ""),
-            ("NUMPAD_PLUS", "NUMPAD_PLUS", ""),
-            ("F1", "F1", ""),
-            ("F2", "F2", ""),
-            ("F3", "F3", ""),
-            ("F4", "F4", ""),
-            ("F5", "F5", ""),
-            ("F6", "F6", ""),
-            ("F7", "F7", ""),
-            ("F8", "F8", ""),
-            ("F9", "F9", ""),
-            ("F10", "F10", ""),
-            ("F11", "F11", ""),
-            ("F12", "F12", ""),
-            ("F13", "F13", ""),
-            ("F14", "F14", ""),
-            ("F15", "F15", ""),
-            ("F16", "F16", ""),
-            ("F17", "F17", ""),
-            ("F18", "F18", ""),
-            ("F19", "F19", ""),
-            ("PAUSE", "PAUSE", ""),
-            ("INSERT", "INSERT", ""),
-            ("HOME", "HOME", ""),
-            ("PAGE_UP", "PAGE_UP", ""),
-            ("PAGE_DOWN", "PAGE_DOWN", ""),
-            ("END", "END", ""),
-            ("MEDIA_PLAY", "MEDIA_PLAY", ""),
-            ("MEDIA_STOP", "MEDIA_STOP", ""),
-            ("MEDIA_FIRST", "MEDIA_FIRST", ""),
-            ("MEDIA_LAST", "MEDIA_LAST", ""),
-            ("TEXTINPUT", "TEXTINPUT", ""),
-            ("WINDOW_DEACTIVATE", "WINDOW_DEACTIVATE", ""),
-            ("TIMER", "TIMER", ""),
-            ("TIMER0", "TIMER0", ""),
-            ("TIMER1", "TIMER1", ""),
-            ("TIMER2", "TIMER2", ""),
-            ("TIMER_JOBS", "TIMER_JOBS", ""),
-            ("TIMER_AUTOSAVE", "TIMER_AUTOSAVE", ""),
-            ("TIMER_REPORT", "TIMER_REPORT", ""),
-            ("TIMERREGION", "TIMERREGION", ""),
-            ("NDOF_MOTION", "NDOF_MOTION", ""),
-            ("NDOF_BUTTON_MENU", "NDOF_BUTTON_MENU", ""),
-            ("NDOF_BUTTON_FIT", "NDOF_BUTTON_FIT", ""),
-            ("NDOF_BUTTON_TOP", "NDOF_BUTTON_TOP", ""),
-            ("NDOF_BUTTON_BOTTOM", "NDOF_BUTTON_BOTTOM", ""),
-            ("NDOF_BUTTON_LEFT", "NDOF_BUTTON_LEFT", ""),
-            ("NDOF_BUTTON_RIGHT", "NDOF_BUTTON_RIGHT", ""),
-            ("NDOF_BUTTON_FRONT", "NDOF_BUTTON_FRONT", ""),
-            ("NDOF_BUTTON_BACK", "NDOF_BUTTON_BACK", ""),
-            ("NDOF_BUTTON_ISO1", "NDOF_BUTTON_ISO1", ""),
-            ("NDOF_BUTTON_ISO2", "NDOF_BUTTON_ISO2", ""),
-            ("NDOF_BUTTON_ROLL_CW", "NDOF_BUTTON_ROLL_CW", ""),
-            ("NDOF_BUTTON_ROLL_CCW", "NDOF_BUTTON_ROLL_CCW", ""),
-            ("NDOF_BUTTON_SPIN_CW", "NDOF_BUTTON_SPIN_CW", ""),
-            ("NDOF_BUTTON_SPIN_CCW", "NDOF_BUTTON_SPIN_CCW", ""),
-            ("NDOF_BUTTON_TILT_CW", "NDOF_BUTTON_TILT_CW", ""),
-            ("NDOF_BUTTON_TILT_CCW", "NDOF_BUTTON_TILT_CCW", ""),
-            ("NDOF_BUTTON_ROTATE", "NDOF_BUTTON_ROTATE", ""),
-            ("NDOF_BUTTON_PANZOOM", "NDOF_BUTTON_PANZOOM", ""),
-            ("NDOF_BUTTON_DOMINANT", "NDOF_BUTTON_DOMINANT", ""),
-            ("NDOF_BUTTON_PLUS", "NDOF_BUTTON_PLUS", ""),
-            ("NDOF_BUTTON_MINUS", "NDOF_BUTTON_MINUS", ""),
-            ("NDOF_BUTTON_ESC", "NDOF_BUTTON_ESC", ""),
-            ("NDOF_BUTTON_ALT", "NDOF_BUTTON_ALT", ""),
-            ("NDOF_BUTTON_SHIFT", "NDOF_BUTTON_SHIFT", ""),
-            ("NDOF_BUTTON_CTRL", "NDOF_BUTTON_CTRL", ""),
-            ("NDOF_BUTTON_1", "NDOF_BUTTON_1", ""),
-            ("NDOF_BUTTON_2", "NDOF_BUTTON_2", ""),
-            ("NDOF_BUTTON_3", "NDOF_BUTTON_3", ""),
-            ("NDOF_BUTTON_4", "NDOF_BUTTON_4", ""),
-            ("NDOF_BUTTON_5", "NDOF_BUTTON_5", ""),
-            ("NDOF_BUTTON_6", "NDOF_BUTTON_6", ""),
-            ("NDOF_BUTTON_7", "NDOF_BUTTON_7", ""),
-            ("NDOF_BUTTON_8", "NDOF_BUTTON_8", ""),
-            ("NDOF_BUTTON_9", "NDOF_BUTTON_9", ""),
-            ("NDOF_BUTTON_10", "NDOF_BUTTON_10", ""),
-            ("NDOF_BUTTON_A", "NDOF_BUTTON_A", ""),
-            ("NDOF_BUTTON_B", "NDOF_BUTTON_B", ""),
-            ("NDOF_BUTTON_C", "NDOF_BUTTON_C", "")
-        ),
+    keys = (
+        ("NONE", "Select key", ""),
+        ("LEFTMOUSE", "LEFTMOUSE", ""),
+        ("MIDDLEMOUSE", "MIDDLEMOUSE", ""),
+        ("RIGHTMOUSE", "RIGHTMOUSE", ""),
+        ("BUTTON4MOUSE", "BUTTON4MOUSE", ""),
+        ("BUTTON5MOUSE", "BUTTON5MOUSE", ""),
+        ("BUTTON6MOUSE", "BUTTON6MOUSE", ""),
+        ("BUTTON7MOUSE", "BUTTON7MOUSE", ""),
+        ("MOUSEMOVE", "MOUSEMOVE", ""),
+        ("INBETWEEN_MOUSEMOVE", "INBETWEEN_MOUSEMOVE", ""),
+        ("TRACKPADPAN", "TRACKPADPAN", ""),
+        ("TRACKPADZOOM", "TRACKPADZOOM", ""),
+        ("MOUSEROTATE", "MOUSEROTATE", ""),
+        ("WHEELUPMOUSE", "WHEELUPMOUSE", ""),
+        ("WHEELDOWNMOUSE", "WHEELDOWNMOUSE", ""),
+        ("WHEELINMOUSE", "WHEELINMOUSE", ""),
+        ("WHEELOUTMOUSE", "WHEELOUTMOUSE", ""),
+        ("A", "A", ""),
+        ("B", "B", ""),
+        ("C", "C", ""),
+        ("D", "D", ""),
+        ("E", "E", ""),
+        ("F", "F", ""),
+        ("G", "G", ""),
+        ("H", "H", ""),
+        ("I", "I", ""),
+        ("J", "J", ""),
+        ("K", "K", ""),
+        ("L", "L", ""),
+        ("M", "M", ""),
+        ("N", "N", ""),
+        ("O", "O", ""),
+        ("P", "P", ""),
+        ("Q", "Q", ""),
+        ("R", "R", ""),
+        ("S", "S", ""),
+        ("T", "T", ""),
+        ("U", "U", ""),
+        ("V", "V", ""),
+        ("W", "W", ""),
+        ("X", "X", ""),
+        ("Y", "Y", ""),
+        ("Z", "Z", ""),
+        ("ZERO", "ZERO", ""),
+        ("ONE", "ONE", ""),
+        ("TWO", "TWO", ""),
+        ("THREE", "THREE", ""),
+        ("FOUR", "FOUR", ""),
+        ("FIVE", "FIVE", ""),
+        ("SIX", "SIX", ""),
+        ("SEVEN", "SEVEN", ""),
+        ("EIGHT", "EIGHT", ""),
+        ("NINE", "NINE", ""),
+        ("LEFT_CTRL", "LEFT_CTRL", ""),
+        ("LEFT_ALT", "LEFT_ALT", ""),
+        ("LEFT_SHIFT", "LEFT_SHIFT", ""),
+        ("RIGHT_ALT", "RIGHT_ALT", ""),
+        ("RIGHT_CTRL", "RIGHT_CTRL", ""),
+        ("RIGHT_SHIFT", "RIGHT_SHIFT", ""),
+        ("OSKEY", "OSKEY", ""),
+        ("GRLESS", "GRLESS", ""),
+        ("ESC", "ESC", ""),
+        ("TAB", "TAB", ""),
+        ("RET", "RET", ""),
+        ("SPACE", "SPACE", ""),
+        ("LINE_FEED", "LINE_FEED", ""),
+        ("BACK_SPACE", "BACK_SPACE", ""),
+        ("DEL", "DEL", ""),
+        ("SEMI_COLON", "SEMI_COLON", ""),
+        ("PERIOD", "PERIOD", ""),
+        ("COMMA", "COMMA", ""),
+        ("QUOTE", "QUOTE", ""),
+        ("ACCENT_GRAVE", "ACCENT_GRAVE", ""),
+        ("MINUS", "MINUS", ""),
+        ("SLASH", "SLASH", ""),
+        ("BACK_SLASH", "BACK_SLASH", ""),
+        ("EQUAL", "EQUAL", ""),
+        ("LEFT_BRACKET", "LEFT_BRACKET", ""),
+        ("RIGHT_BRACKET", "RIGHT_BRACKET", ""),
+        ("LEFT_ARROW", "LEFT_ARROW", ""),
+        ("DOWN_ARROW", "DOWN_ARROW", ""),
+        ("RIGHT_ARROW", "RIGHT_ARROW", ""),
+        ("UP_ARROW", "UP_ARROW", ""),
+        ("NUMPAD_1", "NUMPAD_1", ""),
+        ("NUMPAD_2", "NUMPAD_2", ""),
+        ("NUMPAD_3", "NUMPAD_3", ""),
+        ("NUMPAD_4", "NUMPAD_4", ""),
+        ("NUMPAD_5", "NUMPAD_5", ""),
+        ("NUMPAD_6", "NUMPAD_6", ""),
+        ("NUMPAD_7", "NUMPAD_7", ""),
+        ("NUMPAD_8", "NUMPAD_8", ""),
+        ("NUMPAD_9", "NUMPAD_9", ""),
+        ("NUMPAD_0", "NUMPAD_0", ""),
+        ("NUMPAD_PERIOD", "NUMPAD_PERIOD", ""),
+        ("NUMPAD_SLASH", "NUMPAD_SLASH", ""),
+        ("NUMPAD_ASTERIX", "NUMPAD_ASTERIX", ""),
+        ("NUMPAD_MINUS", "NUMPAD_MINUS", ""),
+        ("NUMPAD_ENTER", "NUMPAD_ENTER", ""),
+        ("NUMPAD_PLUS", "NUMPAD_PLUS", ""),
+        ("F1", "F1", ""),
+        ("F2", "F2", ""),
+        ("F3", "F3", ""),
+        ("F4", "F4", ""),
+        ("F5", "F5", ""),
+        ("F6", "F6", ""),
+        ("F7", "F7", ""),
+        ("F8", "F8", ""),
+        ("F9", "F9", ""),
+        ("F10", "F10", ""),
+        ("F11", "F11", ""),
+        ("F12", "F12", ""),
+        ("F13", "F13", ""),
+        ("F14", "F14", ""),
+        ("F15", "F15", ""),
+        ("F16", "F16", ""),
+        ("F17", "F17", ""),
+        ("F18", "F18", ""),
+        ("F19", "F19", ""),
+        ("PAUSE", "PAUSE", ""),
+        ("INSERT", "INSERT", ""),
+        ("HOME", "HOME", ""),
+        ("PAGE_UP", "PAGE_UP", ""),
+        ("PAGE_DOWN", "PAGE_DOWN", ""),
+        ("END", "END", ""),
+        ("MEDIA_PLAY", "MEDIA_PLAY", ""),
+        ("MEDIA_STOP", "MEDIA_STOP", ""),
+        ("MEDIA_FIRST", "MEDIA_FIRST", ""),
+        ("MEDIA_LAST", "MEDIA_LAST", ""),
+        ("TEXTINPUT", "TEXTINPUT", ""),
+        ("WINDOW_DEACTIVATE", "WINDOW_DEACTIVATE", ""),
+        ("TIMER", "TIMER", ""),
+        ("TIMER0", "TIMER0", ""),
+        ("TIMER1", "TIMER1", ""),
+        ("TIMER2", "TIMER2", ""),
+        ("TIMER_JOBS", "TIMER_JOBS", ""),
+        ("TIMER_AUTOSAVE", "TIMER_AUTOSAVE", ""),
+        ("TIMER_REPORT", "TIMER_REPORT", ""),
+        ("TIMERREGION", "TIMERREGION", ""),
+        ("NDOF_MOTION", "NDOF_MOTION", ""),
+        ("NDOF_BUTTON_MENU", "NDOF_BUTTON_MENU", ""),
+        ("NDOF_BUTTON_FIT", "NDOF_BUTTON_FIT", ""),
+        ("NDOF_BUTTON_TOP", "NDOF_BUTTON_TOP", ""),
+        ("NDOF_BUTTON_BOTTOM", "NDOF_BUTTON_BOTTOM", ""),
+        ("NDOF_BUTTON_LEFT", "NDOF_BUTTON_LEFT", ""),
+        ("NDOF_BUTTON_RIGHT", "NDOF_BUTTON_RIGHT", ""),
+        ("NDOF_BUTTON_FRONT", "NDOF_BUTTON_FRONT", ""),
+        ("NDOF_BUTTON_BACK", "NDOF_BUTTON_BACK", ""),
+        ("NDOF_BUTTON_ISO1", "NDOF_BUTTON_ISO1", ""),
+        ("NDOF_BUTTON_ISO2", "NDOF_BUTTON_ISO2", ""),
+        ("NDOF_BUTTON_ROLL_CW", "NDOF_BUTTON_ROLL_CW", ""),
+        ("NDOF_BUTTON_ROLL_CCW", "NDOF_BUTTON_ROLL_CCW", ""),
+        ("NDOF_BUTTON_SPIN_CW", "NDOF_BUTTON_SPIN_CW", ""),
+        ("NDOF_BUTTON_SPIN_CCW", "NDOF_BUTTON_SPIN_CCW", ""),
+        ("NDOF_BUTTON_TILT_CW", "NDOF_BUTTON_TILT_CW", ""),
+        ("NDOF_BUTTON_TILT_CCW", "NDOF_BUTTON_TILT_CCW", ""),
+        ("NDOF_BUTTON_ROTATE", "NDOF_BUTTON_ROTATE", ""),
+        ("NDOF_BUTTON_PANZOOM", "NDOF_BUTTON_PANZOOM", ""),
+        ("NDOF_BUTTON_DOMINANT", "NDOF_BUTTON_DOMINANT", ""),
+        ("NDOF_BUTTON_PLUS", "NDOF_BUTTON_PLUS", ""),
+        ("NDOF_BUTTON_MINUS", "NDOF_BUTTON_MINUS", ""),
+        ("NDOF_BUTTON_ESC", "NDOF_BUTTON_ESC", ""),
+        ("NDOF_BUTTON_ALT", "NDOF_BUTTON_ALT", ""),
+        ("NDOF_BUTTON_SHIFT", "NDOF_BUTTON_SHIFT", ""),
+        ("NDOF_BUTTON_CTRL", "NDOF_BUTTON_CTRL", ""),
+        ("NDOF_BUTTON_1", "NDOF_BUTTON_1", ""),
+        ("NDOF_BUTTON_2", "NDOF_BUTTON_2", ""),
+        ("NDOF_BUTTON_3", "NDOF_BUTTON_3", ""),
+        ("NDOF_BUTTON_4", "NDOF_BUTTON_4", ""),
+        ("NDOF_BUTTON_5", "NDOF_BUTTON_5", ""),
+        ("NDOF_BUTTON_6", "NDOF_BUTTON_6", ""),
+        ("NDOF_BUTTON_7", "NDOF_BUTTON_7", ""),
+        ("NDOF_BUTTON_8", "NDOF_BUTTON_8", ""),
+        ("NDOF_BUTTON_9", "NDOF_BUTTON_9", ""),
+        ("NDOF_BUTTON_10", "NDOF_BUTTON_10", ""),
+        ("NDOF_BUTTON_A", "NDOF_BUTTON_A", ""),
+        ("NDOF_BUTTON_B", "NDOF_BUTTON_B", ""),
+        ("NDOF_BUTTON_C", "NDOF_BUTTON_C", "")
+    )
+    shortcut_panel_key: EnumProperty(
+        items=keys,
         name="Key",
         description="Key",
         default="H",
         update=update_shortcut,
     )
-    shortcut_alt: BoolProperty(
+    shortcut_panel_alt: BoolProperty(
         name="Alt",
         default=False,
         update=update_shortcut,
     )
-    shortcut_shift: BoolProperty(
+    shortcut_panel_shift: BoolProperty(
         name="Shift",
         default=True,
         update=update_shortcut,
     )
-    shortcut_ctrl: BoolProperty(
+    shortcut_panel_ctrl: BoolProperty(
+        name="Ctrl",
+        default=True,
+        update=update_shortcut,
+    )
+    shortcut_rig_key: EnumProperty(
+        items=keys,
+        name="Key",
+        description="Key",
+        default="A",
+        update=update_shortcut,
+    )
+    shortcut_rig_alt: BoolProperty(
+        name="Alt",
+        default=False,
+        update=update_shortcut,
+    )
+    shortcut_rig_shift: BoolProperty(
+        name="Shift",
+        default=True,
+        update=update_shortcut,
+    )
+    shortcut_rig_ctrl: BoolProperty(
         name="Ctrl",
         default=True,
         update=update_shortcut,
@@ -342,60 +361,76 @@ class GBHPreferences(AddonPreferences):
         wm = bpy.context.window_manager
         gbh_update = wm.gbh_update
 
-        box = layout.box()
+        update_section = layout.column(align=True)
+        box = update_section.box()
         col = box.column()
         col.label(text="Add-on Updates:")
         row = col.row()
-        if self.update_available:
-            row.operator(
+        update_button = row.row()
+        update_button.scale_y = 1.3
+        if gv.update_checking:
+            update_button.enabled = False
+            update_button.operator("gbh.update_check", icon="FILE_REFRESH", text="Checking for Updates...")
+
+        elif self.update_available:
+            update_button.operator(
                 "gbh.update_check",
                 text="",
                 icon="FILE_REFRESH"
             )
-            row.operator(
+            update_button.operator(
                 "wm.url_open",
                 icon="IMPORT",
-                text="Download"
-            ).url = const.URL_DOCS
+                text=f"Download GBH Tool {self.update_latest_version}"
+            ).url = gv.ULR_UPDATE
+
+            sub_row = update_button.row()
+            sub_row.scale_x = 0.6
+            sub_row.operator(
+                "wm.url_open",
+                icon="INFO",
+                text="Changelog"
+            ).url = gv.ULR_UPDATE_INFO
 
         else:
-            row.operator("gbh.update_check", icon="FILE_REFRESH")
+            update_button.operator("gbh.update_check", icon="FILE_REFRESH")
 
-        row.prop(self, "update_channel", text="")
         row = col.row()
-        row.prop(self, "startup_update_check")
+        row.prop(self, "automatic_update_check")
+        row = row.row()
+        row.enabled = self.automatic_update_check
+        row.prop(self, "update_check_interval", text="")
+
         row = col.row()
-        row.label(text=f"Lase Update Check: {self.last_update_check}")
+        row.label(text=f"Last Update Check: {self.last_update_check}")
         col = col.column()
         col.label(text=f"Last Update Check Report: {gbh_update.update_report}")
-        if self.update_available:
-            box = box.box()
-            box.label(text="Update Info")
-            col = box.column()
 
-            lv = self.update_latest_version
-            rt = self.update_release_type
-            bv = self.update_blender_version
-            um = self.update_message
-
-            row = box.row()
-            row.label(text="", icon="INFO")
-            col = row.column()
-            update_version = F"GBH Tool v{lv} {rt} is Available for Blender {bv} and later."
-            multi_line_text(
-                context=context,
-                text=update_version,
-                parent=col
-            )
-            if um != "":
-                row = box.row()
-                row.label(text="", icon="INFO")
-                col = row.column()
-                multi_line_text(
-                    context=context,
-                    text=um,
-                    parent=col
-                )
+        box = update_section.box()
+        col = box.column()
+        col.label(text="Get Preview Builds:")
+        col = box.column()
+        row = col.row()
+        row.label(text="GBH Tool Update Branches")
+        row.prop(gbh_update, "update_branches", text="")
+        col.label(text=f"Latest Commit: {gbh_update.update_latest_commit}")
+        if gbh_update.update_branches != "NA":
+            update_url = f"{gv.URL_GITHUB}/archive/refs/heads/{gbh_update.update_branches}.zip"
+            col.operator(
+                "wm.url_open",
+                icon="IMPORT",
+                text=f'Download Latest Build from "{gbh_update.update_branches}" Branch'
+            ).url = update_url
+            col.label(
+                text="Installing preview builds will most likely break your Blender installation, so please use them with caution!",
+                icon="ERROR")
+            col.label(text="Remove the current GBH Tool installation before proceeding.", icon="ERROR")
+            col.label(text="Make a backup of Blender's data folder before proceeding!", icon="ERROR")
+            col.operator(
+                "gbh.open_folder",
+                text="Open Blender's Data Folder",
+                icon="TOOL_SETTINGS"
+            ).path = gv.DIR_BLENDER_DATA_FOLDER
 
         box = layout.box()
         col = box.column()
@@ -411,15 +446,27 @@ class GBHPreferences(AddonPreferences):
         for panel in panels:
             col.prop(self, panel)
 
+        box = layout.box()
         col = box.column()
+        col.label(text="Shortcuts:")
         col.label(text="Panel Toggle Pie Menu Shortcut:")
         row = col.row()
-        row.prop(self, "shortcut_key")
+        row.prop(self, "shortcut_panel_key")
         row = row.row()
         row.scale_x = 0.6
-        row.prop(self, "shortcut_ctrl", toggle=True)
-        row.prop(self, "shortcut_shift", toggle=True)
-        row.prop(self, "shortcut_alt", toggle=True)
+        row.prop(self, "shortcut_panel_ctrl", toggle=True)
+        row.prop(self, "shortcut_panel_shift", toggle=True)
+        row.prop(self, "shortcut_panel_alt", toggle=True)
+
+        col = box.column()
+        col.label(text="Rig Pie Menu Shortcut:")
+        row = col.row()
+        row.prop(self, "shortcut_rig_key")
+        row = row.row()
+        row.scale_x = 0.6
+        row.prop(self, "shortcut_rig_ctrl", toggle=True)
+        row.prop(self, "shortcut_rig_shift", toggle=True)
+        row.prop(self, "shortcut_rig_alt", toggle=True)
 
         box = layout.box()
         row = box.row()
@@ -430,6 +477,21 @@ class GBHPreferences(AddonPreferences):
         row = box.row()
         row.label(text="Library Items Per Page:")
         row.prop(self, "lib_item_per_page", text="")
+        gbh_library = bpy.context.preferences.filepaths.asset_libraries.get("GBH Library")
+        if not gbh_library:
+            row = box.row()
+            row.operator(
+                "gbh.gbh_to_asset_browser",
+                icon="ADD"
+            ).add = True
+
+        if gbh_library:
+            row = box.row()
+            row.operator(
+                "gbh.gbh_to_asset_browser",
+                text="Remove GBH Assets from Blender's Asset Browser",
+                icon="REMOVE"
+            ).add = False
 
         box = layout.box()
         split = box.split()
@@ -439,17 +501,17 @@ class GBHPreferences(AddonPreferences):
             "gbh.open_folder",
             text="Open Presets Folder",
             icon="PRESET"
-        ).path = const.DIR_PRESETS
+        ).path = gv.DIR_PRESETS
         col.operator(
             "gbh.open_folder",
             text="Open Library Folder",
             icon="ASSET_MANAGER"
-        ).path = const.DIR_LIBRARY
+        ).path = gv.DIR_LIBRARY
         col.operator(
             "gbh.open_folder",
             text="Open Textures Folder",
             icon="TEXTURE"
-        ).path = const.DIR_TEXTURES
+        ).path = gv.DIR_TEXTURES
 
 
 classes = (

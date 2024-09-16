@@ -6,7 +6,7 @@ import platform
 from bpy.types import Operator
 from bpy.props import StringProperty
 
-from .. constants import INVALID_PATH
+from ..global_variables import INVALID_PATH
 
 
 class GBH_OT_open_folder(Operator):
@@ -40,7 +40,7 @@ class GBH_OT_open_folder(Operator):
         return {"FINISHED"}
 
     def _show_error(self, err):
-        print(err)
+        print(f"GBH Tool: {err}")
         err = "An error occurred, please try opening the directory manually."
         self.report({"ERROR"}, err)
 

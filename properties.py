@@ -12,6 +12,7 @@ from bpy.props import (
     CollectionProperty,
 )
 
+from . import global_variables as gv
 from . operators.hair_card_ops import rename_renders
 from . operators.presets_ops import refresh_presets_list
 from . operators import library_ops as lib_ops
@@ -24,6 +25,30 @@ def _hair_object_poll(self, obj):
     valid_obj_type = ["CURVE", "CURVES"]
     if obj.type in valid_obj_type and obj in list(bpy.context.scene.objects):
         return obj.type
+
+
+"""Rigging poll functions"""
+
+
+def _parent_bone_armature_poll(self, obj):
+    valid_obj_type = ["ARMATURE"]
+    if obj.type in valid_obj_type and obj in list(bpy.context.scene.objects):
+        hair_object_name = bpy.context.scene.hair_object.name
+        return obj.type if obj.data.name != f"{hair_object_name}_Armature" else None
+
+
+"""Rigging items return functions"""
+
+
+def _get_obj_bones_names(self, context):
+    bone_names = ["Active Bone"]
+
+    if (
+        parent_armature := context.window_manager.gbh_rig.arm_parent_armature
+    ):
+        # Iterate through all bones in the armature.
+        bone_names.extend(sorted((bone.name for bone in parent_armature.data.bones)))
+    return [(name, name, "") for name in bone_names]
 
 
 """Presets update functions"""
@@ -58,25 +83,17 @@ def _lib_search_update(self, context):
 """Rig update functions"""
 
 
-def _rig_int_update(self, context):
+def _arm_update(self, context):
     wm = context.window_manager
     gbh_rig = wm.gbh_rig
-    if gbh_rig.rig_live_preview:
+    if gbh_rig.arm_live_preview:
         bpy.ops.gbh.hair_to_armature()
 
 
-def _rig_float_update(self, context):
+def _arm_parent_armature_update(self, context):
     wm = context.window_manager
     gbh_rig = wm.gbh_rig
-    if gbh_rig.rig_live_preview:
-        bpy.ops.gbh.hair_to_armature()
-
-
-def _rig_bool_update(self, context):
-    wm = context.window_manager
-    gbh_rig = wm.gbh_rig
-    if gbh_rig.rig_live_preview:
-        bpy.ops.gbh.hair_to_armature()
+    gbh_rig.arm_parent_bone = "Active Bone"
 
 
 """Hair Card update functions"""
@@ -86,14 +103,14 @@ def _render_complete_handler(self, context):
     if self.hc_add_current_frame_to_names:
         try:
             bpy.app.handlers.render_complete.remove(rename_renders)
-            print("Render rename handler removed")
+            print("GBH Tool: Render rename handler removed.")
 
         except ValueError as err:
-            print(err)
+            print(f"GBH Tool: {err}")
 
     else:
         bpy.app.handlers.render_complete.append(rename_renders)
-        print("Render rename handler added")
+        print("GBH Tool: Render rename handler added.")
 
 
 """Mods functions"""
@@ -113,6 +130,23 @@ def _particle_parent_object_poll(self, obj):
     valid_obj_type = ["MESH"]
     if obj.type in valid_obj_type and obj in list(bpy.context.scene.objects):
         return obj.type
+
+
+"""Update Checker functions"""
+
+
+def _get_update_branches(self, context):
+    return gv.branches_cache
+
+
+def _latest_commit_date_update(self, context):
+    wm = context.window_manager
+    gbh_update = wm.gbh_update
+
+    if gv.branches_latest_commits.get(gbh_update.update_branches):
+        gbh_update.update_latest_commit = gv.branches_latest_commits[gbh_update.update_branches]
+    else:
+        gbh_update.update_latest_commit = "Not Available"
 
 
 """
@@ -204,6 +238,7 @@ class GBH_LibraryProperties(PropertyGroup):
     lib_search: StringProperty(
         name="Library Search",
         description="Search for keywords in library",
+        options={"TEXTEDIT_UPDATE"},
         default="",
         update=_lib_search_update
     )
@@ -224,69 +259,200 @@ class GBH_RigProperties(PropertyGroup):
         name="Minimize/Maximize Armature Creation",
         default=True,
     )
-    rig_live_preview: BoolProperty(
+    rig_keep_previous_selection: BoolProperty(
+        name="Keep Previous Selection",
+        default=False,
+    )
+    arm_display_type: EnumProperty(
+        name="Display Armature As",
+        description="Change bones display type in the 3d viewport.",
+        items=[
+            ("OCTAHEDRAL", "Octahedral", ""),
+            ("STICK", "Stick", ""),
+            ("BBONE", "B-Bone", ""),
+            ("ENVELOPE", "Envelope", ""),
+            ("WIRE", "Wire", ""),
+        ],
+        update=_arm_update,
+    )
+    arm_bbone_segments: IntProperty(
+        name="B-Bone Segments",
+        description="Number of subdivisions of bone (for B-Bones only)",
+        min=1,
+        soft_max=10,
+        default=5,
+        update=_arm_update,
+    )
+    arm_bbone_x: FloatProperty(
+        name="B-Bone Display X Width",
+        description="B-Bone X size",
+        min=0,
+        soft_max=0.1,
+        default=0.01,
+        update=_arm_update,
+    )
+    arm_bbone_z: FloatProperty(
+        name="B-Bone Display Z Width",
+        description="B-Bone Z size",
+        min=0,
+        soft_max=0.1,
+        default=0.01,
+        update=_arm_update,
+    )
+    arm_name_chain: StringProperty(
+        name="Chain Name",
+        default="Hair",
+        update=_arm_update,
+    )
+    arm_name_bone: StringProperty(
+        name="Bone Name",
+        default="Bone",
+        update=_arm_update,
+    )
+    arm_name_separator: StringProperty(
+        name="Separator",
+        default="_",
+        update=_arm_update,
+    )
+    arm_name_parent_bone: StringProperty(
+        name="Parent Bone Name",
+        default="Parent_Bone",
+        update=_arm_update,
+    )
+    arm_live_preview: BoolProperty(
         name="Live Preview",
         description="Show live preview of bones",
         default=True,
     )
-    rig_res: IntProperty(
+    arm_res: IntProperty(
         name="Rig Resolution",
         description="Number of bones in each chain",
         min=2,
         soft_max=10,
         default=5,
-        update=_rig_int_update,
+        update=_arm_update,
     )
-    rig_density: FloatProperty(
+    arm_density: FloatProperty(
         name="Rig Density",
         description="Density of bones chains per hair curves",
         min=0,
         max=100,
         default=100,
-        update=_rig_float_update,
+        update=_arm_update,
     )
-    rig_start: FloatProperty(
+    arm_start: FloatProperty(
         name="Rig Start",
         description="Start of bone chains in relation to hair curves",
         min=0,
         max=100,
         default=0,
-        update=_rig_float_update,
+        update=_arm_update,
     )
-    rig_end: FloatProperty(
+    arm_end: FloatProperty(
         name="Rig End",
         description="End of bone chains in relation to hair curves",
         min=0,
         max=100,
         default=100,
-        update=_rig_float_update,
+        update=_arm_update,
     )
-    rig_parent_size: FloatProperty(
-        name="Armature Parent Bone Size (cm)",
+    arm_parent_size: FloatProperty(
+        name="Armature Parent Bone Size",
         description="Size of added parent bone to the armature",
-        min=5,
-        max=100,
-        default=25,
-        update=_rig_float_update,
+        min=0.05,
+        max=1,
+        default=0.25,
+        unit="LENGTH",
+        update=_arm_update,
     )
-    rig_reverse: BoolProperty(
+    arm_reverse: BoolProperty(
         name="Reverse Chains Direction",
         description="Reverse bone chains direction",
-        update=_rig_bool_update,
+        update=_arm_update,
     )
-    rig_add_parent_bone: BoolProperty(
-        name="Add Parent Bone",
-        description="Add parent bone to armature",
-        default=True,
-        update=_rig_bool_update,
+    arm_add_parent_bone: EnumProperty(
+        name="Parent Bone",
+        description="Parent bone creation / selection",
+        default="NONE",
+        items=[
+            ("NONE", "None", ""),
+            ("BONE", "Add Parent Bone to Armature", ""),
+            ("ARM", "Select Parent Bone from Another Armature", ""),
+        ],
+        update=_arm_update,
     )
-    rig_use_mods: BoolProperty(
+    arm_parent_armature: PointerProperty(
+        name="Parent Armature",
+        description="Parent armature selection",
+        type=bpy.types.Object,
+        poll=_parent_bone_armature_poll,
+        update=_arm_parent_armature_update,
+    )
+    arm_parent_bone: EnumProperty(
+        name="Parent Bone",
+        description="List of bones from selected armature",
+        items=_get_obj_bones_names,
+        update=_arm_update,
+    )
+    arm_use_mods: BoolProperty(
         name="Use Object's Modifiers",
         description="Use object's modifiers to create armature from",
         default=False,
-        update=_rig_bool_update,
+        update=_arm_update,
     )
-    rig_not_used: StringProperty()
+    arm_not_used_mods: StringProperty()
+
+    arm_weight_paint: BoolProperty(
+        name="Minimize/Maximize Weight Paint",
+        default=True,
+    )
+    wp_clear_from_roots_switch: BoolProperty(
+        name="Clear Weight Paint from Root",
+        default=True,
+    )
+    wp_clear_from_roots_distance: FloatProperty(
+        name="Distance from Root",
+        default=0.025,
+        soft_max=1,
+        min=0,
+        unit="LENGTH"
+    )
+    wp_tweak_levels_switch: BoolProperty(
+        name="Tweak Levels",
+    )
+    wp_levels_offset: FloatProperty(
+        name="Offset",
+        default=0.1,
+        max=1,
+        min=-1,
+    )
+    wp_level_gain: FloatProperty(
+        name="Gain",
+        default=1,
+        soft_max=10,
+        min=0,
+    )
+    wp_smooth_switch: BoolProperty(
+        name="Smooth Weights",
+    )
+    wp_smooth_factor: FloatProperty(
+        name="Factor",
+        default=0.5,
+        max=1,
+        min=0,
+    )
+    wp_smooth_iterations: IntProperty(
+        name="Iterations",
+        default=5,
+        soft_max=200,
+        min=1,
+    )
+    wp_smooth_expand: FloatProperty(
+        name="Expand/Contract",
+        default=1,
+        max=1,
+        min=-1,
+    )
 
 
 class GBH_ConvertProperties(PropertyGroup):
@@ -373,6 +539,10 @@ class GBH_InfoProperties(PropertyGroup):
         name="Minimize/Maximize Rendering Info Section",
         default=False,
     )
+    info_rig: BoolProperty(
+        name="Minimize/Maximize Rig Info Section",
+        default=False,
+    )
 
 
 class GBH_HairCardProperties(PropertyGroup):
@@ -417,6 +587,15 @@ class GBH_UpdateProperties(PropertyGroup):
     """Update property group"""
     update_report: StringProperty(
         default="No update check has been done yet in this session"
+    )
+    update_branches: EnumProperty(
+        name="GBH Tool Update Branches",
+        description="List of update branches in GBH Tool repository",
+        items=_get_update_branches,
+        update=_latest_commit_date_update,
+    )
+    update_latest_commit: StringProperty(
+        default="Not Available",
     )
 
 

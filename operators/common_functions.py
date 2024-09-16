@@ -9,7 +9,7 @@ HAIR_NUM = "Number of converted hair"
 IMPORT_FAIL = "Failed to import, selected item is no longer available."
 
 
-def _link_to_scene(item_name, data_block, scene):
+def link_to_scene(item_name, data_block, scene):
     new_item = bpy.data.objects.new(item_name, data_block)
     scene.collection.objects.link(new_item)
     return new_item
@@ -26,6 +26,18 @@ def set_active_object(context, active_object):
         context.view_layer.objects.active = active_object
 
 
+def set_active_bone(context, armature, active_bone_name):
+    """Set the given bone as active bone"""
+    if context.active_object:
+        bpy.ops.object.mode_set(mode="OBJECT")
+
+    if armature:
+        bpy.ops.object.select_all(action="DESELECT")
+        armature.select_set(state=True, view_layer=context.view_layer)
+        context.view_layer.objects.active = armature
+        armature.data.bones.active = armature.data.bones[active_bone_name]
+
+
 def select_objects(context, objects, active_object):
     """Select multiple objects and set the given one as active object"""
     if context.active_object:
@@ -33,7 +45,7 @@ def select_objects(context, objects, active_object):
 
     if objects and active_object:
         bpy.ops.object.select_all(action="DESELECT")
-        if type(objects) is list:
+        if isinstance(objects, list):
             for obj in objects:
                 obj.select_set(state=True, view_layer=context.view_layer)
 
@@ -140,6 +152,9 @@ def delete_item(data_item):
     elif data_type == "Camera":
         data_list = bpy.data.cameras
 
+    elif data_type == "Armature":
+        data_list = bpy.data.armatures
+
     elif data_type in light_types:
         data_list = bpy.data.lights
 
@@ -159,8 +174,8 @@ def append_node_groups(self, context, path, ng_name):
         node_path = os.path.join(path, "NodeTree/")
         bpy.ops.wm.append(filename=ng_name, directory=node_path)
 
-    except (RuntimeError,  OSError) as err:
-        print(err)
+    except (RuntimeError, OSError) as err:
+        print(f"GBH Tool: {err}")
         err = IMPORT_FAIL
         self.report({"ERROR"}, err)
 
@@ -174,8 +189,8 @@ def append_materials(self, context, path, mat_name):
         mat_path = os.path.join(path, "Material/")
         bpy.ops.wm.append(filename=mat_name, directory=mat_path)
 
-    except (RuntimeError,  OSError) as err:
-        print(err)
+    except (RuntimeError, OSError) as err:
+        print(f"GBH Tool: {err}")
         err = IMPORT_FAIL
         self.report({"ERROR"}, err)
 
@@ -193,7 +208,7 @@ def append_object(self, object_path, object_name):
             return obj
 
     except (RuntimeError, OSError) as err:
-        print(err)
+        print(f"GBH Tool: {err}")
         err = IMPORT_FAIL
         self.report({"ERROR"}, err)
 
@@ -207,51 +222,61 @@ def create_mesh_object(self, context, object_name):
         bpy.data.objects.remove(existing_object, do_unlink=True)
 
     mesh_block = bpy.data.meshes.new(object_name)
-    return _link_to_scene(object_name, mesh_block, context.scene)
+    return link_to_scene(object_name, mesh_block, context.scene)
 
 
-def convert_object(context, obj, target):
+def convert_object(context, obj, target, keep_original=False):
     """Convert object based on given type"""
     set_active_object(context, obj)
-    bpy.ops.object.convert(target=target)
+    bpy.ops.object.convert(target=target, keep_original=keep_original)
 
 
-def duplicate_item(context, scene, source_item, duplicate_name, apply_transform):
+def duplicate_item(context, source_item, duplicate_name, apply_transform=False,
+                   clear_modifiers=False, restore_active_object=True, linked=False):
     """Duplicate object using its data block"""
-    duple_data = source_item.data.copy()
-    duple_data.name = duplicate_name
-    duple_object = _link_to_scene(duple_data.name, duple_data, scene)
 
+    initial_active_object = context.object
+    set_active_object(context, source_item)
+    bpy.ops.object.duplicate(linked=linked)
+
+    item_duple = context.object
+    item_duple.name = duplicate_name
+    item_duple.data.name = duplicate_name
+    if clear_modifiers:
+        clear_object_modifiers(item_duple)
     if apply_transform:
-        set_active_object(context, duple_object)
         bpy.ops.object.transform_apply(
             location=True,
             rotation=True,
             scale=True
         )
-
-    return duple_object
+    if restore_active_object:
+        set_active_object(context, initial_active_object)
+    else:
+        set_active_object(context, item_duple)
+    return item_duple
 
 
 def copy_modifiers(context, source_object, target_object, clear_existing_modifiers):
     """Copy modifiers from given source to target object"""
     if source_object and target_object:
         if clear_existing_modifiers:
-            mods = target_object.modifiers
-            for mod in mods:
-                target_object.modifiers.remove(mod)
-
+            clear_object_modifiers(target_object)
         select_objects(
             context,
             objects=target_object,
             active_object=source_object
         )
 
-        # Copy modifiers from source to target objects
+        # Copy modifiers from source to target objects.
+        with context.temp_override(selected_objects=source_object):
+            bpy.ops.object.make_links_data(type="MODIFIERS")
 
-        override = bpy.context.copy()
-        override["object"] = source_object
-        bpy.ops.object.make_links_data(override, type="MODIFIERS")
+
+def clear_object_modifiers(obj):
+    mods = obj.modifiers
+    for mod in mods:
+        obj.modifiers.remove(mod)
 
 
 def set_object_location(obj, location):
@@ -259,6 +284,13 @@ def set_object_location(obj, location):
     objects = bpy.data.objects
     if objects.get(obj.name):
         objects[obj.name].location = location
+
+
+def set_object_scale(obj, scale):
+    """Sets object scale to given location"""
+    objects = bpy.data.objects
+    if objects.get(obj.name):
+        objects[obj.name].scale = scale
 
 
 def set_object_rotation(obj, rotation):
@@ -275,7 +307,7 @@ def set_ng_modifiers(obj, ng_name, **kwargs):
     float_props = kwargs.get("float_props")
     bool_props = kwargs.get("bool_props")
 
-    # Add geometry node modifier to generated hair mesh
+    # Add geometry node modifier to generated hair mesh.
 
     if not obj.modifiers.get(ng_name):
         obj.modifiers.new(name=ng_name, type="NODES")
@@ -283,7 +315,7 @@ def set_ng_modifiers(obj, ng_name, **kwargs):
     ng = bpy.data.node_groups[ng_name]
     obj.modifiers[ng_name].node_group = ng
 
-    # Set values for pointer props
+    # Set values for pointer props.
 
     if pointer_props:
         for pointer_prop in pointer_props:
@@ -294,7 +326,7 @@ def set_ng_modifiers(obj, ng_name, **kwargs):
                     pointer_prop[2]
                 )
 
-    # Set values for float props
+    # Set values for float props.
 
     if float_props:
         for float_prop in float_props:
@@ -304,7 +336,7 @@ def set_ng_modifiers(obj, ng_name, **kwargs):
                     float_prop[1]
                 )
 
-    # Set values for integer props
+    # Set values for integer props.
 
     if int_props:
         for int_prop in int_props:
@@ -314,7 +346,7 @@ def set_ng_modifiers(obj, ng_name, **kwargs):
                     int_prop[1]
                 )
 
-    # Set values for bool props
+    # Set values for bool props.
 
     if bool_props:
         for bool_prop in bool_props:
@@ -329,11 +361,15 @@ def create_new_item(context, scene, item_name, item_type):
     """Create new data block and add it to a new object and given scene"""
     if item_type == "CURVE":
         data_block = bpy.data.curves.new(item_name, "CURVE")
-        return _link_to_scene(item_name, data_block, scene)
+        return link_to_scene(item_name, data_block, scene)
 
     if item_type == "CURVES":
         data_block = bpy.data.hair_curves.new(item_name)
-        return _link_to_scene(item_name, data_block, scene)
+        return link_to_scene(item_name, data_block, scene)
+
+    if item_type == "ARMATURE":
+        data_block = bpy.data.armatures.new(item_name)
+        return link_to_scene(item_name, data_block, scene)
 
     if item_type == "SCENE":
         bpy.ops.scene.new(type="NEW")
@@ -343,13 +379,20 @@ def create_new_item(context, scene, item_name, item_type):
 
     if item_type == "SUN_LIGHT":
         data_block = bpy.data.lights.new(name=item_name, type="SUN")
-        return _link_to_scene(item_name, data_block, scene)
+        return link_to_scene(item_name, data_block, scene)
 
     if item_type == "CAMERA":
         data_block = bpy.data.cameras.new(name=item_name)
-        return _link_to_scene(item_name, data_block, scene)
+        return link_to_scene(item_name, data_block, scene)
 
     if item_type == "WORLD":
         world = bpy.data.worlds.new(item_name)
         scene.world = world
         return world
+
+
+def redraw_area_ui(area_type):
+    for window in bpy.context.window_manager.windows:
+        for area in window.screen.areas:
+            if (area.type == area_type):
+                area.tag_redraw()

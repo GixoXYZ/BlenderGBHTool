@@ -1,0 +1,29 @@
+schema_version = "1.0.0"
+
+id = "gbhtool"
+version = "2.2.0"
+name = "GBH Tool"
+tagline = "Procedural hair add-on for Blender"
+maintainer = "Gixo <GixoXYZ@proton.me>"
+website = "https://gixo.xyz/GBHToolDocs/"
+type = "add-on"
+
+tags = ["Object", "Geometry Nodes", "Rigging"]
+
+blender_version_min = "4.2.1"
+
+license = ["SPDX:GPL-2.0-or-later"]
+
+files = "Import/export files from/to disk"
+
+[build]
+paths_exclude_pattern = [
+    "__pycache__/",
+    "/.git/*",
+    "/*.zip",
+    "/.github/*",
+    "/.vs/*",
+    "/.vscode/*",
+    "/README.md",
+    "/working_files/*",
+]

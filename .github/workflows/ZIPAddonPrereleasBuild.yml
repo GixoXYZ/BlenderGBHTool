@@ -16,7 +16,7 @@ jobs:
         id: extract_branch_name
         run: |
           branch_name=$(echo "${{ github.ref_name }}" | sed -E 's/^[^0-9]*([0-9]+\.[0-9]+).*/\1/')
-          echo "::set-output name=branch_name::${branch_name}"
+          echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
 
       # Checkout the repository under a subdirectory (repository-name/) to
       # make zipping easier. Note: 'gh' or 'git' commands must be executed

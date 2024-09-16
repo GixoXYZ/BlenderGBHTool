@@ -11,7 +11,7 @@ class GBHBasePanel:
 
 
 def box_sub_panel(layout, header_icon, label, source, prop, icon_value):
-    """Create closable sub-panel box"""
+    """Collapsable sub-panel box"""
     state = getattr(source, prop)
     main = layout.column(align=True)
     header = main.box()
@@ -56,7 +56,7 @@ def box_sub_panel(layout, header_icon, label, source, prop, icon_value):
 
 
 def multi_line_text(context, text, parent):
-    """Make texts distribution dynamically"""
+    """Dynamic multi-line text"""
     chars = int(context.region.width / 7)
     wrapper = textwrap.TextWrapper(width=chars)
     text_lines = wrapper.wrap(text=text)
@@ -67,4 +67,9 @@ def multi_line_text(context, text, parent):
 def clear_pointer_if_object_deleted(context, prop_parent, prop_pointer):
     if attr := getattr(prop_parent, prop_pointer):
         if not context.scene.objects.get(attr.name):
-            prop_parent.property_unset(prop_pointer)
+            # Set the property to None. This way calls the update function of properties as well.
+
+            if hasattr(context.scene, prop_pointer):
+                prop_parent.property_unset(prop_pointer)
+            else:
+                setattr(prop_parent, prop_pointer, None)

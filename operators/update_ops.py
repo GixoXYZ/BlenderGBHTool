@@ -4,32 +4,82 @@ import bpy
 import json
 import requests
 import datetime
-import concurrent.futures
+import re
+import threading
 from bpy.types import Operator
 
-from .. import constants as const
+from .. import global_variables as gv
+from . import common_functions as cf
 
-UPDATE_INTERVAL = 24
-UPDATE_TIMEOUT = 5
+UPDATE_TIMEOUT = 20
 DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 UPDATE_INTERNET_FAIL = "Failed to connect to update server."
-UPDATE_CHECK_FAIL = "Failed to check for updates."
+UPDATE_GET_FAIL = "Failed to retrieve updates."
 UPDATE_NEW = "New update available."
 UPDATE_NO_NEW = "No new updates available."
-UPDATE_CHANNEL_ERROR = "Selected update channel is not available."
 
 
-def addon_info(gbh_version):
-    global GBH_VERSION
-    GBH_VERSION = gbh_version
+def check_for_updates():
+    pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
+    wm = bpy.context.window_manager
+    gbh_update = wm.gbh_update
+
+    gv.update_checking = True
+    if release_info := get_latest_release_info():
+        if compare_versions(release_info["tag"], gv.GBH_VERSION):
+            gv.ULR_UPDATE = release_info["url"]
+            gv.ULR_UPDATE_INFO = release_info["info_url"]
+            pref.update_available = True
+            gbh_update.update_report = UPDATE_NEW
+            pref.update_latest_version = release_info["tag"]
+
+        else:
+            pref.update_available = False
+            gbh_update.update_report = UPDATE_NO_NEW
+
+        pref.last_update_check = datetime.datetime.now().strftime(DATE_TIME_FORMAT)
+
+    cache_gh_branches()
+
+    gv.update_checking = False
+    cf.redraw_area_ui("PREFERENCES")
+    cf.redraw_area_ui("VIEW_3D")
 
 
-def _version_compare(installed_v, update_v):
-    return installed_v < update_v
+def compare_versions(latest_tag, gbh_version):
+    # Convert latest tag to a list.
+    online_version = re.findall(r"\d+|[A-Za-z]+", latest_tag)[1:]
+    parsed_online_version = [int(match) if match.isdigit() else match for match in online_version]
+    return parsed_online_version > gbh_version
+
+
+def get_latest_release_info():
+    pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
+    wm = bpy.context.window_manager
+    gbh_update = wm.gbh_update
+
+    try:
+        response = requests.get(gv.URL_RELEASE_LATEST, timeout=UPDATE_TIMEOUT)
+        if response.status_code == 200:
+            if releases := response.json():
+                print(f"GBH Tool: Latest downloadable version is {releases['tag_name']}.")
+                assets = releases["assets"]
+                download_url = assets[0]["browser_download_url"]
+                release_tag = releases["tag_name"]
+                update_info_url = releases["html_url"]
+                return {"tag": release_tag, "url": download_url, "info_url": update_info_url}
+        else:
+            gbh_update.update_report = f"{UPDATE_GET_FAIL} Status code: {response.status_code}"
+            return None
+
+    except (requests.exceptions.ConnectionError, requests.exceptions.RequestException) as err:
+        print(f"GBH Tool: {err}")
+        gbh_update.update_report = UPDATE_INTERNET_FAIL
+        return None
 
 
 def _has_time_elapsed():
-    pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
+    pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
     if pref.last_update_check == "Never":
         return True
 
@@ -39,64 +89,36 @@ def _has_time_elapsed():
         DATE_TIME_FORMAT
     )
     time_diff = now - last_check
-    return time_diff.total_seconds() / 3600.0 > UPDATE_INTERVAL
+    return time_diff.total_seconds() / 3600.0 > int(pref.update_check_interval)
 
 
-def update_checker():
-    pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
+def cache_gh_branches():
     wm = bpy.context.window_manager
     gbh_update = wm.gbh_update
 
-    try:
-        res = requests.get(const.URL_UPDATE, timeout=UPDATE_TIMEOUT)
-        if not res.ok:
-            gbh_update.update_report = UPDATE_INTERNET_FAIL
-            return
-        else:
-            response = requests.get(const.URL_UPDATE)
+    response = requests.get(gv.URL_BRANCHES)
+    # Check if the request was successful
+    if response.status_code == 200:
+        branches = response.json()
+        gv.branches_cache = [(branch["name"], branch["name"], "") for branch in branches]
 
-    except requests.exceptions.RequestException as err:
-        print(err)
-        gbh_update.update_report = UPDATE_INTERNET_FAIL
-        return
+        gv.branches_latest_commits.clear()
+        for branch in branches:
+            branch_name = branch["name"]
+            commit_url = branch["commit"]["url"]
 
-    try:
-        data = json.loads(response.text)
+            # Fetch the latest commit info to get the date
+            commit_response = requests.get(commit_url)
 
-    except json.decoder.JSONDecodeError as err:
-        print(err)
-        gbh_update.update_report = UPDATE_CHECK_FAIL
-        return
+            if commit_response.status_code == 200:
+                commit_data = commit_response.json()
+                commit_date_str = commit_data["commit"]["committer"]["date"]
+                commit_date = str(datetime.datetime.strptime(commit_date_str, "%Y-%m-%dT%H:%M:%SZ"))
 
-    if data.get(pref.update_channel):
-        try:
-            pref.update_latest_version = data[pref.update_channel]["version"]
-            pref.update_release_type = data[pref.update_channel]["release_type"]
-            pref.update_blender_version = data[pref.update_channel]["blender_version"]
-            pref.update_message = data[pref.update_channel]["message"]
-            pref.update_changelog = str(data[pref.update_channel]["changelog"])
-            pref.last_update_check = datetime.datetime.now().strftime(DATE_TIME_FORMAT)
+                gv.branches_latest_commits[branch_name] = commit_date
 
-        except KeyError as err:
-            print(err)
-            gbh_update.update_report = UPDATE_CHECK_FAIL
-            return
-
-        installed_version = GBH_VERSION.split(".")
-        latest_version = data[pref.update_channel]["version"].split(".")
-
-        if _version_compare(installed_version, latest_version):
-            pref.update_available = True
-            gbh_update.update_report = UPDATE_NEW
-
-        else:
-            pref.update_available = False
-            gbh_update.update_report = UPDATE_NO_NEW
-            return
-
-    elif not data.get(pref.update_channel):
-        gbh_update.update_report = UPDATE_CHANNEL_ERROR
-        return
+    if hasattr(gbh_update, "update_branches"):
+        gbh_update.update_latest_commit = gv.branches_latest_commits.get(gbh_update.update_branches, "Not Available")
 
 
 class GBH_OT_update_check(Operator):
@@ -105,9 +127,9 @@ class GBH_OT_update_check(Operator):
     bl_description = "Check for GBH Tool updates"
 
     def execute(self, context):
-        # Run update checker on a new thread
-        executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
-        executor.submit(update_checker)
+        gv.update_checking = True
+        # Run update checker on a new thread.
+        threading.Thread(target=check_for_updates).start()
         return {"FINISHED"}
 
 
@@ -121,16 +143,16 @@ def register():
     for cls in classes:
         register_class(cls)
 
-    pref = bpy.context.preferences.addons[const.GBH_PACKAGE].preferences
-    if not _version_compare(GBH_VERSION.split("."), pref.update_latest_version.split(".")):
+    pref = bpy.context.preferences.addons[gv.GBH_PACKAGE].preferences
+    if not compare_versions(pref.update_latest_version, gv.GBH_VERSION):
         pref.update_available = False
 
-    has_time_elapsed = _has_time_elapsed()
-
-    if pref.startup_update_check and has_time_elapsed:
-        # Run update checker on a new thread
-        executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
-        executor.submit(update_checker)
+    if pref.automatic_update_check:
+        # Run update checker on a new thread.
+        if _has_time_elapsed():
+            threading.Thread(target=check_for_updates).start()
+        else:
+            threading.Thread(target=cache_gh_branches).start()
 
 
 def unregister():
