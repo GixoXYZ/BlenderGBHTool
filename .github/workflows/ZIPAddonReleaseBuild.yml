@@ -5,7 +5,7 @@ name: ZIP Addon Release Build
 on:
   push:
     tags:
-      - '*_stable'
+      - '*'
 
 jobs:
   build:
