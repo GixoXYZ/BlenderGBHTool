@@ -2,9 +2,6 @@
 
 ![GBH Tool](https://repository-images.githubusercontent.com/643273409/75698699-2d7a-4f59-b3f7-ea55fe638a32)
 
-[Download GBH Tool on Gumroad](https://gixo.gumroad.com/l/GBHTool)
-
-[Download GBH Tool on GitHub ![](https://img.shields.io/github/downloads/GixoXYZ/BlenderGBHTool/total?style=flat&logo=github&label=%C2%A0&color=%23447fcf)](https://github.com/GixoXYZ/BlenderGBHTool/releases)
 
 ---
 
@@ -26,18 +23,27 @@
 Check out [GBH Tool Manual](https://gixo.xyz/GBHToolDocs/) for more details.
 
 ---
+## Requirements:
+
+The table below shows each version of the GBH Tool along with the minimum required Blender version.
+
+| GBH Tool | Blender |
+| -------- | ------- |
+| 1.1.x    | 3.4     |
+| 2.0.x    | 3.5     |
+| 2.1.x    | 3.5     |
+| 2.2.x    | 4.2     |
+
+--- 
+## Downloading:
+
+Future updates to the GBH Tool are supported by sales on [Gumroad](https://gixo.gumroad.com/l/GBHTool). For those interested, the tool is also available on [GitHub ![](https://img.shields.io/github/downloads/GixoXYZ/BlenderGBHTool/total?style=flat&logo=github&label=%C2%A0&color=%23447fcf)](https://github.com/GixoXYZ/BlenderGBHTool/releases) for educational use or testing purposes prior to purchase.
 
 ## Installation:
 
-In Blender: Edit -> Preferences -> Add-ons -> Install -> Select downloaded zip and enable check-mark
+In Blender: Edit -> Preferences -> Get Extensions -> drop down menu on top right corner -> Install from Disk -> select the downloaded zip.
 
 ---
-
-## Requirements:
-
-- Blender 3.5 and later
-
---- 
 
 ## Roadmap:
 
