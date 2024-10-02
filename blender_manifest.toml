@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "gbhtool"
-version = "2.2.0"
+version = "2.2.1"
 name = "GBH Tool"
 tagline = "Procedural hair add-on for Blender"
 maintainer = "Gixo <GixoXYZ@proton.me>"
