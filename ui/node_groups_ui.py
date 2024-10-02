@@ -210,7 +210,7 @@ class VIEW3D_PT_ng_ui_main(Panel, GBHBasePanel):
 
     def _node_outputs(self, layout, sub_panel, ng):
         valid_node_outputs_names = [
-            output.name for output in ng.node_group.outputs if output.type != "GEOMETRY"]
+            output.name for output in ng.node_group.interface.items_tree if output.socket_type != "NodeSocketGeometry"]
         output_prop_ids = [prop_id for prop_id in ng.keys()if (
             prop_id.startswith("Output_") and prop_id.endswith("attribute_name"))]
 

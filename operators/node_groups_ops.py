@@ -15,9 +15,21 @@ def _attr_or_vertex_group_name_enum_items(self, context):
     groups = [
         (group.name, f"Point > {group.name}", "") for group in obj.vertex_groups
     ]
-    attrs = [
-        (attr.name, f"{attr.domain.capitalize()} > {attr.name}", "") for attr in obj.data.attributes
-    ]
+
+    if obj.type == "CURVE":
+        attrs = [
+            ("tilt", "Point > tilt", ""),
+            ("normal_mode", "Spline > normal_mode", ""),
+            ("curve_type", "Spline > curve_type", ""),
+            ("cyclic", "Spline > cyclic", ""),
+            ("radius", "Point > radius", ""),
+            ("resolution", "Spline > resolution", ""),
+            ("position", "Point > position", "")
+        ]
+    else:
+        attrs = [
+            (attr.name, f"{attr.domain.capitalize()} > {attr.name}", "") for attr in obj.data.attributes
+        ]
     return groups + attrs
 
 
