@@ -132,8 +132,9 @@ class VIEW3D_PT_ng_ui_main(Panel, GBHBasePanel):
                 for socket in input_node.outputs[:-1]
                 if socket.is_linked == True
             )
-        input_prop_ids = [prop_id for prop_id in ng.keys()
-                          if (prop_id.startswith("Input_") and prop_id[-1].isdigit())]
+        # input_prop_ids = [prop_id for prop_id in ng.keys() if (prop_id.startswith("Input_") and prop_id[-1].isdigit())]
+
+        input_prop_ids = [prop_id for prop_id in ng.keys() if (prop_id[-1].isdigit())]
 
         input_identifiers_names_types_shapes = zip(
             input_prop_ids,
@@ -152,7 +153,7 @@ class VIEW3D_PT_ng_ui_main(Panel, GBHBasePanel):
 
         for prop_id, name, input_type, socket_shape in input_identifiers_names_types_shapes:
             row = layout.row(align=True)
-            if name not in linked_inputs:
+            if name not in linked_inputs and ng.node_group.nodes.get(name):
                 row.label(text=name)
                 col = layout.column()
                 with contextlib.suppress(TypeError, IndexError, AttributeError):
@@ -167,7 +168,7 @@ class VIEW3D_PT_ng_ui_main(Panel, GBHBasePanel):
                     )
                     layout.separator()
 
-            if input_type in datablock_input_info_per_type:
+            elif input_type in datablock_input_info_per_type:
                 input_info = datablock_input_info_per_type[input_type]
                 row.label(text=name)
                 row.prop_search(
@@ -210,9 +211,12 @@ class VIEW3D_PT_ng_ui_main(Panel, GBHBasePanel):
 
     def _node_outputs(self, layout, sub_panel, ng):
         valid_node_outputs_names = [
-            output.name for output in ng.node_group.interface.items_tree if output.socket_type != "NodeSocketGeometry"]
-        output_prop_ids = [prop_id for prop_id in ng.keys()if (
-            prop_id.startswith("Output_") and prop_id.endswith("attribute_name"))]
+            output.name for output in ng.node_group.interface.items_tree
+            if output.item_type == "SOCKET"
+            if output.in_out == "OUTPUT" and output.socket_type != "NodeSocketGeometry"
+        ]
+
+        output_prop_ids = [prop_id for prop_id in ng.keys()if prop_id.endswith("attribute_name")]
 
         if not output_prop_ids:
             return
