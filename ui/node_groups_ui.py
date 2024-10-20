@@ -218,7 +218,7 @@ class VIEW3D_PT_ng_ui_main(Panel, GBHBasePanel):
 
         output_prop_ids = [prop_id for prop_id in ng.keys()if prop_id.endswith("attribute_name")]
 
-        if not output_prop_ids:
+        if not valid_node_outputs_names:
             return
 
         footer = sub_panel[3].box()
