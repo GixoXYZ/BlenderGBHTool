@@ -3,7 +3,7 @@
 # A portion of this program includes code from Antti Tikka's Modifier List Blender add-on released in April 1, 2022.
 # Modifier List's code is used under the terms of the GNU General Public License v3.
 
-import toml
+import tomllib
 import os
 
 from . import global_variables as gv
@@ -93,8 +93,8 @@ modules = [
 def register():
     script_dir = os.path.dirname(__file__)
     file_path = os.path.join(script_dir, "blender_manifest.toml")
-    with open(file_path, "r") as file:
-        manifest_data = toml.load(file)
+    with open(file_path, "rb") as file:
+        manifest_data = tomllib.load(file)
         version = manifest_data["version"]
         gv.GBH_VERSION = [int(part) for part in version.split('.')]
     for module in modules:
